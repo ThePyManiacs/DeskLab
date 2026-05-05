@@ -44,7 +44,7 @@ class _PygameKeyMapper:
         if key_value := self.__key_map.get(key_name):
             return [key_value]
 
-        error = f"{key_name} is not recognised as a valid key name. Valid options are: {self.__SPECIAL_KEYS.keys(), self.__key_map.keys()}"
+        error = f"{key_name} is not recognised as a valid key name"
         raise ValueError(error)
 
 
