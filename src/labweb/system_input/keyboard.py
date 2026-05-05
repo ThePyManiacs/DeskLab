@@ -58,11 +58,12 @@ class KeyBoard(Entity):
 
     def update_event(self, event: Event):
         self.__event = event
-        self.__mod = event.mod
 
         if event.type == KEYDOWN:
+            self.__mod = event.mod
             self.__pressed_keys.add(event.key)
         elif event.type == KEYUP:
+            self.__mod = event.mod
             self.__pressed_keys.discard(event.key)
         elif event.type == TEXTINPUT:
             self.__buffer.append(event.text)
@@ -83,6 +84,7 @@ class KeyBoard(Entity):
         return any(key in self.__pressed_keys for key in key_values)
 
     def __key_events(self, key: str, event_type: int) -> bool:
+        key = key.lower()
         key_values = self.__key_mapper.get_key(key)
         return (
             self.__event is not None and
