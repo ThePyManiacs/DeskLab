@@ -43,14 +43,16 @@ class Text(DisplayableEntity, ContainableEntity, ColorableEntity, CopiableEntity
     def set_y(self, y: int) -> None:
         super().set_y(self.__fix_y(y))
 
-    def maximize(self, max_width: int, max_height: int) -> None:
+    def maximize(self, max_width: int, max_height: int) -> "Text":
         size = 0
+        new_instance = self.copy()
         while True:
-            self.set_size(size)
-            if self.get_width() > max_width or self.get_height() > max_height:
-                self.set_size(size - 1 if size > 1 else 1)
+            new_instance.set_size(size)
+            if new_instance.get_width() > max_width or new_instance.get_height() > max_height:
+                new_instance.set_size(size - 1 if size > 1 else 1)
                 break
             size += 1
+        return new_instance
 
     def __get_dimensions(self) -> tuple[int, int]:
         font = pygame.font.Font(None, self.get_size())
