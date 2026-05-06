@@ -16,6 +16,7 @@ class FlexBox(FlexContainer):
     def clear(self) -> None: return self._clear()
     def length(self) -> int: return self._length()
     def is_empty(self) -> bool: return self._is_empty()
+    def index(self, entity: Entity) -> int: return self._index(entity)
 
     def get_horizontal_alignment(self) -> HorizontalAlignment:
         return self._get_horizontal_alignment()

@@ -94,6 +94,9 @@ class FlexContainerInterface(RectangularArea, EventSensitiveEntity):
         self.__children.insert(index, entity)
         self._align()
 
+    def _index(self, entity: Entity) -> int:
+        return self.__children.index(entity)
+
     def _copy(self) -> 'FlexContainerInterface':
         new_container = self.__class__(
             width=self.get_width(),
