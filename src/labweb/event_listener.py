@@ -9,6 +9,7 @@ class EventListener(EventSensitiveEntity):
         self.set_condition(condition)
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
+        super().handle_event(*args, **kwargs)
         if self._trigger_condition(*args, **kwargs):
             self._trigger_actions(*args, **kwargs)
 
@@ -49,6 +50,7 @@ class FirstTimeEventListener(EventListener):
         super().__init__(condition, actions)
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
+        super().handle_event(*args, **kwargs)
         if not self.__has_triggered and self._trigger_condition():
             self._trigger_actions()
             self.__has_triggered = True
@@ -61,7 +63,7 @@ class ChangeEventListener(EventListener):
         super().__init__(condition, actions)
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
-
+        super().handle_event(*args, **kwargs)
         condition_value = self._trigger_condition()
         if self.__previous_state is not None and condition_value != self.__previous_state:
             self._trigger_actions()

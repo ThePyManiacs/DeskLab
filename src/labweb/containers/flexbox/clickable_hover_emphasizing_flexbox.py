@@ -1,7 +1,7 @@
 from typing import Any
 
-from labweb.color import Color
-from labweb.constants import FlexDirection, HorizontalAlignment, VerticalAlignment
+from src.labweb.color import Color
+from src.labweb.constants import FlexDirection, HorizontalAlignment, VerticalAlignment
 from src.labweb.containers.flexbox.protected_flexbox import ProtectedFlexBox
 from src.labweb.area import ClickableArea, HoverEmphasizingArea
 

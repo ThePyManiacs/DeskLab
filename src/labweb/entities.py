@@ -11,8 +11,7 @@ class Entity(ABC):
 class EventSensitiveEntity(Entity):
     @abstractmethod
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
-        error = f"ERROR: 'handle_event' can't be called directly from {self.__class__.__name__}"
-        raise NotImplementedError(error)
+        pass
 
 
 class DisplayableEntity(Entity):

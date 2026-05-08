@@ -2,6 +2,7 @@ from typing import Any
 from src.labweb.system_input.mouse import Mouse
 from src.labweb.color import Color
 from src.labweb.area import RectangularArea
+from src.labweb.entities import EventSensitiveEntity
 from pygame import Surface
 import pygame
 from src.labweb.utils import point_to_segment_distance
@@ -16,7 +17,7 @@ class _DrawingState(Enum):
     FILLING = 5
 
 
-class DrawingArea(RectangularArea):
+class DrawingArea(RectangularArea, EventSensitiveEntity):
 
     def __init__(self,
                  width: int,
@@ -109,6 +110,7 @@ class DrawingArea(RectangularArea):
         return self.__drawing_state
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
+        super().handle_event(*args, **kwargs)
         mouse = kwargs.get("mouse")
 
         if not isinstance(mouse, Mouse):

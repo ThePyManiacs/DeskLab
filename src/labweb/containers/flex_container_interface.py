@@ -78,6 +78,7 @@ class FlexContainerInterface(RectangularArea, EventSensitiveEntity):
                 child.display(screen)
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
+        super().handle_event(*args, **kwargs)
         for child in self._get_children():
             if isinstance(child, EventSensitiveEntity):
                 child.handle_event(*args, **kwargs)

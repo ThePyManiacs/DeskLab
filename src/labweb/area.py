@@ -113,6 +113,7 @@ class ClickableArea(RectangularArea, EventSensitiveEntity):
     def __init__(self, width: int, height: int, color: Color | tuple[int, int, int] | str = "BLACK", corners_radius: tuple[int, int, int, int] | int = 0) -> None:
         super().__init__(width, height, color, corners_radius)
         self.__is_clicked = False
+        self.__is_held = False
 
     def is_clicked(self) -> bool:
         return self.__is_clicked
@@ -121,6 +122,7 @@ class ClickableArea(RectangularArea, EventSensitiveEntity):
         return self.__is_held
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
+        super().handle_event(*args, **kwargs)
         mouse = kwargs.get("mouse")
         if not isinstance(mouse, Mouse):
             raise ValueError(
@@ -165,6 +167,7 @@ class HoverEmphasizingArea(RectangularArea, EventSensitiveEntity):
         super().set_color(color)
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
+        super().handle_event(*args, **kwargs)
         mouse = kwargs.get("mouse")
         if not isinstance(mouse, Mouse):
             error = "Expected a Mouse instance in kwargs with key 'mouse'"
