@@ -2,10 +2,10 @@ from typing import Any, Optional
 from src.labweb.entities import Entity
 from src.labweb.text import Text
 from src.labweb.color import Color
-from src.labweb.containers.flexbox.clickable_flexbox import ClickableFlexBox
-from src.labweb.containers.flexbox.flexbox import FlexBox
-from src.labweb.system_input.mouse import Mouse
-from src.labweb.system_input.keyboard import KeyBoard
+from src.labweb.containers.clickable_flexbox import ClickableFlexBox
+from src.labweb.containers.flexbox import FlexBox
+from src.labweb.system.mouse import Mouse
+from src.labweb.system.keyboard import KeyBoard
 
 
 class _TextInputCell(FlexBox):
@@ -132,14 +132,15 @@ class TextInput(ClickableFlexBox):
             if not text:
                 return
             self.__text_container.force_cell_append(text)
+            self.__text += text
 
     def __add_delete_listener(self, keyboard: KeyBoard):
 
         if not self.is_focused() or not keyboard.key_down("backspace"):
             return
-
-        if not keyboard.ctrl_active() and not keyboard.meta_active():
+        elif not keyboard.ctrl_active() and not keyboard.meta_active():
             self.__text_container.pop()
-            return
-
-        self.__text_container.delete_last_word()
+            self.__text = self.__text[:-1]
+        else:
+            self.__text = " ".join(self.__text.split(" ")[:-1])
+            self.__text_container.delete_last_word()
