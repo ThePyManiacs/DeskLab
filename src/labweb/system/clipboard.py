@@ -22,18 +22,22 @@ class _ClipBoardBackend(ABC):
     _FILE_FORMAT: Final = "text/uri-list" if os.name != 'nt' else "FileNameW"
     _BMP_FORMAT: Final = "image/bmp"
 
+    def __raise_not_implemented_error(self, method_name: str) -> None:
+        error = f"method '{method_name}' can't be called directly from {self.__class__.__name__}"
+        raise NotImplementedError(error)
+
     def has_text(self) -> bool:
         if pyperclip.paste():
             return True
         return pygame.scrap.contains(self._TEXT_FORMAT)
 
+    @abstractmethod
     def has_files(self) -> bool:
-        return pygame.scrap.contains(self._FILE_FORMAT)
+        self.__raise_not_implemented_error("has_files")
 
     @abstractmethod
     def has_image(self) -> bool:
-        error = f"method 'has_image' can't be called directly from {self.__class__.__name__}"
-        raise NotImplementedError(error)
+        self.__raise_not_implemented_error("has_image")
 
     def put_text(self, text: str | Text) -> None:
         content = text.get_text() if isinstance(text, Text) else text
@@ -43,6 +47,54 @@ class _ClipBoardBackend(ABC):
             pass
         finally:
             pyperclip.copy(content)
+
+    @abstractmethod
+    def put_files(self, file_paths: List[str]) -> None:
+        self.__raise_not_implemented_error("put_files")
+
+    @abstractmethod
+    def put_image(self, image: np.ndarray) -> None:
+        self.__raise_not_implemented_error("put_image")
+
+    def get_text(self) -> str:
+        text = pyperclip.paste()
+        if text:
+            return text
+
+        data = pygame.scrap.get(self._TEXT_FORMAT)
+        if data:
+            return data.decode('utf-8').rstrip('\x00')
+        return ""
+
+    @abstractmethod
+    def get_files(self) -> List[str]:
+        self.__raise_not_implemented_error("get_files")
+
+    @abstractmethod
+    def get_image(self) -> Optional[Image]:
+        self.__raise_not_implemented_error("get_image")
+
+    @abstractmethod
+    def clear(self) -> None:
+        self.__raise_not_implemented_error("clear")
+
+    def _search_paths_within_clipboard_text(self) -> list[str]:
+        text_content = self.get_text()
+        lines = text_content.splitlines()
+        potential_paths = [l.strip()
+                           for l in lines if os.path.exists(l.strip())]
+        return potential_paths if potential_paths else []
+
+
+class _DefaultClipBoardBackend(_ClipBoardBackend):
+
+    def has_files(self) -> bool:
+        return pygame.scrap.contains(self._FILE_FORMAT)
+
+    def has_image(self) -> bool:
+        if pygame.scrap.contains(self._BMP_FORMAT):
+            return True
+        return False
 
     def put_files(self, file_paths: List[str]) -> None:
         uris: List[str] = []
@@ -57,25 +109,16 @@ class _ClipBoardBackend(ABC):
         pygame.scrap.put(self._FILE_FORMAT, data)
         self.put_text("\n".join(file_paths))
 
-    @abstractmethod
     def put_image(self, image: np.ndarray) -> None:
-        error = f"method 'put_image' can't be called directly from {self.__class__.__name__}"
-        raise NotImplementedError(error)
-
-    def get_text(self) -> str:
-        text = pyperclip.paste()
-        if text:
-            return text
-
-        data = pygame.scrap.get(self._TEXT_FORMAT)
-        if data:
-            return data.decode('utf-8').rstrip('\x00')
-        return ""
+        temp_surface = pygame.surfarray.make_surface(image)
+        image_buffer = io.BytesIO()
+        pygame.image.save(temp_surface, image_buffer, "BMP")
+        pygame.scrap.put(self._BMP_FORMAT, image_buffer.getvalue())
 
     def get_files(self) -> List[str]:
         data = pygame.scrap.get(self._FILE_FORMAT)
         if not data:
-            return self.__search_paths_within_clipboard_text()
+            return self._search_paths_within_clipboard_text()
 
         raw_list = data.decode(
             'utf-8', errors='ignore').rstrip('\x00').splitlines()
@@ -85,42 +128,11 @@ class _ClipBoardBackend(ABC):
                 paths.append(self.__normaliza_file_path(line))
         return paths
 
-    def __search_paths_within_clipboard_text(self) -> list[str]:
-        text_content = self.get_text()
-        lines = text_content.splitlines()
-        potential_paths = [l.strip()
-                           for l in lines if os.path.exists(l.strip())]
-        return potential_paths if potential_paths else []
-
     def __normaliza_file_path(self, path: str) -> str:
         path = path.split("file://")[-1].strip()
         if os.name == 'nt' and path.startswith("/") and ":" in path:
             path = path[1:]
         return path
-
-    @abstractmethod
-    def get_image(self) -> Optional[Image]:
-        error = f"method 'get_image' can't be called directly from {self.__class__.__name__}"
-        raise NotImplementedError(error)
-
-    @abstractmethod
-    def clear(self) -> None:
-        pygame.scrap.put(self._TEXT_FORMAT, b"")
-        pyperclip.copy("")
-
-
-class _DefaultClipBoardBackend(_ClipBoardBackend):
-
-    def has_image(self) -> bool:
-        if pygame.scrap.contains(self._BMP_FORMAT):
-            return True
-        return False
-
-    def put_image(self, image: np.ndarray) -> None:
-        temp_surface = pygame.surfarray.make_surface(image)
-        image_buffer = io.BytesIO()
-        pygame.image.save(temp_surface, image_buffer, "BMP")
-        pygame.scrap.put(self._BMP_FORMAT, image_buffer.getvalue())
 
     def get_image(self) -> Optional[Image]:
         data = pygame.scrap.get(self._BMP_FORMAT)
@@ -136,19 +148,60 @@ class _DefaultClipBoardBackend(_ClipBoardBackend):
             return None
 
     def clear(self) -> None:
-        return super().clear()
+        pygame.scrap.put(self._TEXT_FORMAT, b"")
+        pyperclip.copy("")
 
 
 class _MacOsClipBoardBackend(_ClipBoardBackend):
 
     @no_type_check
-    def has_image(self) -> bool:
+    def __init__(self) -> None:
+        from AppKit import NSPasteboard, NSPasteboardTypeTIFF  # type: ignore
+        from Foundation import NSURL  # type: ignore
+
+        self.__paste_board = NSPasteboard
+        self.__paste_board_type = NSPasteboardTypeTIFF
+        self.__url_class = NSURL
+
+    @no_type_check
+    def has_files(self) -> bool:
         try:
-            from AppKit import NSPasteboard, NSPasteboardTypeTIFF  # type: ignore
-            pb = NSPasteboard.generalPasteboard()
-            return pb.availableTypeFromArray_([NSPasteboardTypeTIFF]) is not None
-        except ImportError:
+            pb = self.__paste_board.generalPasteboard()
+
+            file_types = ["NSFilenamesPboardType",
+                          "public.file-url"]
+
+            return any(pb.availableTypeFromArray_([t]) is not None
+                       for t in file_types)
+        except Exception:
             return False
+
+    @no_type_check
+    def has_image(self) -> bool:
+        pb = self.__paste_board.generalPasteboard()
+        return pb.availableTypeFromArray_([self.__paste_board_type]) is not None
+
+    def put_files(self, file_paths: List[str]) -> None:
+        abs_paths = [os.path.abspath(p).replace('"', '\\"')
+                     for p in file_paths]
+        paths_string = '{"' + '", "'.join(abs_paths) + '"}'
+
+        script = f'''
+            set posixPaths to {paths_string}
+            set fileList to {{}}
+            repeat with aPath in posixPaths
+                set end of fileList to (POSIX file aPath) as alias
+            end repeat
+            tell application "Finder"
+                set the clipboard to fileList
+            end tell
+            '''
+
+        try:
+            subprocess.run(["osascript", "-e", script], check=True)
+            pyperclip.copy("\n".join(file_paths))
+        except subprocess.CalledProcessError as e:
+            print(f"Unable to copy files into MacOS clipboard: {e}")
 
     def put_image(self, image: np.ndarray) -> None:
         img = PilImage.fromarray(np.transpose(image, (1, 0, 2)))
@@ -164,11 +217,14 @@ class _MacOsClipBoardBackend(_ClipBoardBackend):
                 os.remove(temp_file)
 
     @no_type_check
+    def get_files(self) -> List[str]:
+        return self._search_paths_within_clipboard_text()
+
+    @no_type_check
     def get_image(self) -> Optional[Image]:
         try:
-            from AppKit import NSPasteboard, NSPasteboardTypeTIFF  # type: ignore
-            pasteboard = NSPasteboard.generalPasteboard()
-            data = pasteboard.dataForType_(NSPasteboardTypeTIFF)
+            pasteboard = self.__paste_board.generalPasteboard()
+            data = pasteboard.dataForType_(self.__paste_board_type)
             if data is None:
                 return None
             image_bytes = bytes(data)
@@ -180,7 +236,7 @@ class _MacOsClipBoardBackend(_ClipBoardBackend):
             return None
 
     def clear(self) -> None:
-        super().clear()
+        pyperclip.copy("")
         args = ["osascript", "-e", 'set the clipboard to ""']
         subprocess.run(args, check=False)
 
