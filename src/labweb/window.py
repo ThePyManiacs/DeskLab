@@ -78,6 +78,7 @@ class Window(FlexBox):
                 mouse.update_event(None)
                 self.handle_event(mouse=mouse,
                                   keyboard=keyboard,
+                                  clipboard=clipboard,
                                   screen=self.__screen)
 
             self.__screen.fill((0, 0, 0))
