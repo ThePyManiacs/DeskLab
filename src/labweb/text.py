@@ -66,13 +66,24 @@ class Text(DisplayableEntity, ContainableEntity, ColorableEntity, CopiableEntity
         self.__size = size
         self.__bold = bold
         self.__italic = italic
-        self.__font = None
+        self.__font = pygame.font.Font(None, 0)
         self.__update_font()
 
         super().__init__(x=0, y=0, width=self.__width, height=self.__height, color=color)
 
+    def __add__(self, other: str | Text):
+        copy = self.copy()
+        if isinstance(other, Text):
+            copy.set_text(copy.get_text() + other.get_text())
+        else:
+            copy.set_text(copy.get_text() + other)
+        return copy
+
+    def __len__(self):
+        return len(self.__text)
+
     def __update_font(self) -> None:
-        self.__font = pygame.font.Font(self.get_font(), self.__size)
+        self.__font = pygame.font.Font(self.get_font_path(), self.__size)
         self.__font.set_bold(self.is_bold())
         self.__font.set_italic(self.is_italic())
         self.__width, self.__height = self.__font.size(self.__text)
@@ -105,7 +116,8 @@ class Text(DisplayableEntity, ContainableEntity, ColorableEntity, CopiableEntity
     def set_x(self, x: int) -> None: super().set_x(self.__fix_x(x))
     def set_y(self, y: int) -> None: super().set_y(self.__fix_y(y))
     def is_empty(self) -> bool: return self.get_text() == ""
-    def get_font(self) -> Optional[str]: return self.__font_path
+    def get_font_path(self) -> Optional[str]: return self.__font_path
+    def get_font(self) -> pygame.font.Font: return self.__font
 
     def set_color(self, color: Color | tuple[int, ...] | str):
         return super()._set_color(color)
@@ -131,8 +143,6 @@ class Text(DisplayableEntity, ContainableEntity, ColorableEntity, CopiableEntity
         return new_instance
 
     def display(self, screen: Surface) -> None:
-        if not self.__font:
-            return
         text_surface = self.__font.render(self.__text, True,
                                           self.get_color_tuple())
         text_rect = text_surface.get_rect(center=(self.get_x(), self.get_y()))
@@ -145,3 +155,8 @@ class Text(DisplayableEntity, ContainableEntity, ColorableEntity, CopiableEntity
                               font=self.__font_name,
                               bold=self.is_bold(),
                               italic=self.is_italic())
+
+    def sub(self, start: int | None = None, end: int | None = None) -> "Text":
+        copy = self.copy()
+        copy.set_text(copy.get_text()[start:end])
+        return copy
