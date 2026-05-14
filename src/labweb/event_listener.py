@@ -1,4 +1,7 @@
+from src.labweb.system.mouse import Mouse
+from src.labweb.color import Color
 from src.labweb.entities import EventSensitiveEntity
+from src.labweb.area import Area
 from typing import Any, Callable
 
 
@@ -9,7 +12,6 @@ class EventListener(EventSensitiveEntity):
         self.set_condition(condition)
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
-        super().handle_event(*args, **kwargs)
         if self._trigger_condition(*args, **kwargs):
             self._trigger_actions(*args, **kwargs)
 
@@ -50,9 +52,8 @@ class FirstTimeEventListener(EventListener):
         super().__init__(condition, actions)
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
-        super().handle_event(*args, **kwargs)
-        if not self.__has_triggered and self._trigger_condition():
-            self._trigger_actions()
+        if not self.__has_triggered and self._trigger_condition(*args, **kwargs):
+            self._trigger_actions(*args, **kwargs)
             self.__has_triggered = True
 
 
@@ -63,9 +64,29 @@ class ChangeEventListener(EventListener):
         super().__init__(condition, actions)
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
-        super().handle_event(*args, **kwargs)
-        condition_value = self._trigger_condition()
+        condition_value = self._trigger_condition(*args, **kwargs)
         if self.__previous_state is not None and condition_value != self.__previous_state:
-            self._trigger_actions()
+            self._trigger_actions(*args, **kwargs)
 
         self.__previous_state = condition_value
+
+
+class HoverColorEventListener(ChangeEventListener):
+
+    def __init__(self, area: Area, hover_color: Color | tuple[int, int, int] | str) -> None:
+        self.__area = area
+        self.__default_color = area.get_color()
+        self.__hover_color = hover_color
+        super().__init__(self.__area_contains_mouse_position, self.__change_area_color)
+
+    def __area_contains_mouse_position(self, *args: Any, **kwargs: Any) -> bool:
+        mouse = kwargs.get("mouse")
+        if not isinstance(mouse, Mouse):
+            self._raise_for_missing_parameter("mouse", Mouse.__name__)
+        return self.__area.contains(mouse.get_position())
+
+    def __change_area_color(self) -> None:
+        if self.__area.get_color() == self.__default_color:
+            self.__area.set_color(self.__hover_color)
+            return
+        self.__area.set_color(self.__default_color)
