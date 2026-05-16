@@ -23,13 +23,19 @@ class EventListener(EventSensitiveEntity):
         self.__condition = condition
 
     def get_actions(self) -> list[Callable[..., Any]]:
-        return self.__action
+        return self.__actions
 
     def set_actions(self, action: Callable[..., Any] | list[Callable[..., Any]]) -> None:
         if isinstance(action, list):
-            self.__action = action
+            self.__actions = action
             return
-        self.__action: list[Callable[..., Any]] = [action]
+        self.__actions: list[Callable[..., Any]] = [action]
+
+    def add_actions(self, action: Callable[..., Any] | list[Callable[..., Any]]) -> None:
+        if isinstance(action, Callable):
+            self.__actions.append(action)
+            return
+        self.__actions.extend(action)
 
     def _trigger_condition(self, *args: Any, **kwargs: Any) -> bool:
         condition = self.get_condition()
@@ -114,6 +120,6 @@ class MouseClickEventListener(_MouseEventListener):
         super().__init__(area, actions, "is_clicked")
 
 
-class ç(_MouseEventListener):
+class MouseHoldEventListener(_MouseEventListener):
     def __init__(self, area: Area, actions: Callable[..., Any] | list[Callable[..., Any]]) -> None:
         super().__init__(area, actions, "is_held")
