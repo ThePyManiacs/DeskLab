@@ -1,3 +1,4 @@
+from typing import Callable, Any
 from src.labweb.system.mouse import Mouse
 from src.labweb.color import Color
 from src.labweb.entities import EventSensitiveEntity
@@ -90,3 +91,29 @@ class HoverColorEventListener(ChangeEventListener):
             self.__area.set_color(self.__hover_color)
             return
         self.__area.set_color(self.__default_color)
+
+
+class _MouseEventListener(EventListener):
+
+    def __init__(self, area: Area, actions: Callable[..., Any] | list[Callable[..., Any]], condition_func: str) -> None:
+        self.__area = area
+        super().__init__(lambda *args, **
+                         kwargs: self.__check_mouse_condition(condition_func, **kwargs), actions)
+
+    def __check_mouse_condition(self, condition_func: str, **kwargs: Any) -> bool:
+        mouse = kwargs.get("mouse")
+        if not isinstance(mouse, Mouse):
+            self._raise_for_missing_parameter("mouse", Mouse.__name__)
+
+        mouse_condition = getattr(mouse, condition_func)()
+        return mouse_condition and self.__area.contains(mouse.get_position())
+
+
+class MouseClickEventListener(_MouseEventListener):
+    def __init__(self, area: Area, actions: Callable[..., Any] | list[Callable[..., Any]]) -> None:
+        super().__init__(area, actions, "is_clicked")
+
+
+class ç(_MouseEventListener):
+    def __init__(self, area: Area, actions: Callable[..., Any] | list[Callable[..., Any]]) -> None:
+        super().__init__(area, actions, "is_held")
