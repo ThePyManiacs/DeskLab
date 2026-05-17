@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Self
 
 from src.labweb.system.mouse import Mouse
 from src.labweb.color import Color
@@ -103,7 +103,7 @@ class RectangularArea(Area):
                          border_bottom_left_radius=corners[2],
                          border_bottom_right_radius=corners[3])
 
-    def copy(self) -> "RectangularArea":
+    def copy(self) -> Self:
         return self.__class__(self.get_width(), self.get_height(),
                               self.get_color(), self.get_corners_radius())
 
@@ -131,63 +131,3 @@ class ClickableArea(RectangularArea, EventSensitiveEntity):
 
         self.__is_clicked = mouse.is_clicked() and inside
         self.__is_held = mouse.is_held() and inside
-
-    def copy(self) -> "ClickableArea":
-        return self.__class__(
-            self.get_width(),
-            self.get_height(),
-            self.get_color(),
-            self.get_corners_radius()
-        )
-
-
-class HoverEmphasizingArea(RectangularArea, EventSensitiveEntity):
-
-    def __init__(self,
-                 width: int,
-                 height: int,
-                 color: Color | tuple[int, int, int] | str = "BLACK",
-                 corners_radius: tuple[int, int, int, int] | int = 0,
-                 hover_emphasis_intensity: int = 100) -> None:
-        self.set_color(color)
-        self.__hover_emphasis_intensity = self._ensure_not_negative(
-            hover_emphasis_intensity)
-        super().__init__(width, height, color, corners_radius)
-
-    def __add_hover_listener(self, mouse_pos: tuple[int, int]) -> None:
-
-        hovered = self.contains(mouse_pos)
-        color = self.get_color()
-
-        if hovered:
-            color = color.luminance_emphasized(
-                self.__hover_emphasis_intensity)
-
-        super().set_color(color)
-
-    def handle_event(self, *args: Any, **kwargs: Any) -> None:
-        super().handle_event(*args, **kwargs)
-        mouse = kwargs.get("mouse")
-        if not isinstance(mouse, Mouse):
-            self._raise_for_missing_parameter("mouse", Mouse.__name__)
-        self.__add_hover_listener(mouse.get_position())
-
-    def set_color(self, color: Color | tuple[int, ...] | str):
-        if not isinstance(color, Color):
-            color = Color(color)
-        self.__default_background_color = color
-        return super().set_color(color)
-
-    def get_color(self) -> Color:
-        return self.__default_background_color.copy()
-
-    def get_emphasis_intensity(self) -> int:
-        return self.__hover_emphasis_intensity
-
-    def copy(self) -> "HoverEmphasizingArea":
-        new_instance = self.__class__(self.get_width(),
-                                      self.get_height(),
-                                      self.get_color(),
-                                      self.get_corners_radius(),
-                                      self.get_emphasis_intensity())
-        return new_instance
