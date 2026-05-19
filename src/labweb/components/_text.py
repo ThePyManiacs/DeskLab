@@ -127,9 +127,6 @@ class Text(ClickableArea):
     def get_font_path(self) -> Optional[str]: return self.__font_path
     def get_font(self) -> pygame.font.Font: return self.__font
 
-    def set_color(self, color: Color | tuple[int, ...] | str):
-        return super()._set_color(color)
-
     def set_size(self, size: int) -> None:
         if size < 0:
             error = f"ERROR: size {size} is invalid."
