@@ -56,22 +56,13 @@ class Text(ClickableArea):
     def __init__(self, text: str, size: int = 25, color: Color | tuple[int, ...] | str = "WHITE",
                  font: str | None = None, bold: bool = False, italic: bool = False):
 
-        self.__font_name = font
-        if font and os.path.exists(font):
-            self.__font_path = font
-        elif font is not None:
-            self.__font_path = _FontMapper.get_font_path(font)
-        else:
-            self.__font_path = None
-
         self.__text = text
         self.__size = size
-        self.__bold = bold
-        self.__italic = italic
-        self.__font = pygame.font.Font(None, 0)
-        self.__update_font()
+        self.set_bold_status(bold)
+        self.set_italic_status(italic)
+        self.set_font(font)
 
-        super().__init__(self.__width, self.__height, color, 0)
+        super().__init__(self.get_width(), self.get_height(), color, 0)
 
     def __add__(self, other: str | Self):
         copy = self.copy()
@@ -84,6 +75,28 @@ class Text(ClickableArea):
     def __len__(self):
         return len(self.__text)
 
+    def get_text(self) -> str: return self.__text
+    def get_size(self) -> int: return self.__size
+    def __fix_x(self, x: int) -> int: return x + self.get_width()//2
+    def __fix_y(self, y: int) -> int: return y + self.get_height()//2
+    def set_x(self, x: int) -> None: super().set_x(self.__fix_x(x))
+    def set_y(self, y: int) -> None: super().set_y(self.__fix_y(y))
+    def is_empty(self) -> bool: return self.get_text() == ""
+    def get_font_path(self) -> Optional[str]: return self.__font_path
+    def get_font(self) -> pygame.font.Font: return self.__font
+    def is_bold(self) -> bool: return self.__bold
+    def is_italic(self) -> bool: return self.__italic
+
+    def set_font(self, font_path: str | None):
+        self.__font_name = font_path
+        if font_path and os.path.exists(font_path):
+            self.__font_path = font_path
+        elif font_path is not None:
+            self.__font_path = _FontMapper.get_font_path(font_path)
+        else:
+            self.__font_path = None
+        self.__update_font()
+
     def contains(self, coordinates: tuple[int, int]) -> bool:
         x, y = coordinates
         half_width = self.get_width()//2
@@ -94,51 +107,33 @@ class Text(ClickableArea):
 
     def __update_font(self) -> None:
         self.__font = pygame.font.Font(self.get_font_path(), self.__size)
-        self.__font.set_bold(self.is_bold())
-        self.__font.set_italic(self.is_italic())
-        self.__width, self.__height = self.__font.size(self.__text)
+        self.__update_dimensions()
+
+    def __update_dimensions(self) -> None:
+        new_width, new__height = self.__font.size(self.__text)
+        self._set_width(new_width)
+        self._set_height(new__height)
 
     def set_bold_status(self, status: bool) -> None:
         self.__bold = status
-        self.__update_font()
-        self._set_width(self.__width)
-        self._set_height(self.__height)
+        self.__font.set_bold(status)
+        self.__update_dimensions()
 
     def set_italic_status(self, status: bool) -> None:
         self.__italic = status
-        self.__update_font()
-        self._set_width(self.__width)
-        self._set_height(self.__height)
-
-    def is_bold(self) -> bool: return self.__bold
-    def is_italic(self) -> bool: return self.__italic
+        self.__font.set_italic(status)
+        self.__update_dimensions()
 
     def set_text(self, text: str) -> None:
         self.__text = text
         self.__update_font()
-        self._set_width(self.__width)
-        self._set_height(self.__height)
-
-    def get_text(self) -> str: return self.__text
-    def get_size(self) -> int: return self.__size
-    def __fix_x(self, x: int) -> int: return x + self.get_width()//2
-    def __fix_y(self, y: int) -> int: return y + self.get_height()//2
-    def set_x(self, x: int) -> None: super().set_x(self.__fix_x(x))
-    def set_y(self, y: int) -> None: super().set_y(self.__fix_y(y))
-    def is_empty(self) -> bool: return self.get_text() == ""
-    def get_font_path(self) -> Optional[str]: return self.__font_path
-    def get_font(self) -> pygame.font.Font: return self.__font
 
     def set_size(self, size: int) -> None:
-        if size < 0:
-            error = f"ERROR: size {size} is invalid."
-            raise ValueError(error)
+        self._ensure_not_negative(size)
         self.__size = size
         self.__update_font()
-        self._set_width(self.__width)
-        self._set_height(self.__height)
 
-    def maximize(self, max_width: int, max_height: int) -> "Text":
+    def maximize(self, max_width: int, max_height: int) -> Self:
         low = 1
         high = 500
         optimal_size = 1
@@ -164,7 +159,7 @@ class Text(ClickableArea):
         text_rect = text_surface.get_rect(center=(self.get_x(), self.get_y()))
         screen.blit(text_surface, text_rect)
 
-    def copy(self) -> "Text":
+    def copy(self) -> Self:
         return self.__class__(text=self.get_text(),
                               size=self.get_size(),
                               color=self.get_color(),
@@ -172,7 +167,11 @@ class Text(ClickableArea):
                               bold=self.is_bold(),
                               italic=self.is_italic())
 
-    def sub(self, start: int | None = None, end: int | None = None) -> "Text":
-        copy = self.copy()
-        copy.set_text(copy.get_text()[start:end])
-        return copy
+    def sub(self, start: int | None = None, end: int | None = None) -> Self:
+        end = end+1 if end else None
+        return self.__class__(text=self.get_text()[start:end],
+                              size=self.get_size(),
+                              color=self.get_color(),
+                              font=self.__font_name,
+                              bold=self.is_bold(),
+                              italic=self.is_italic())
