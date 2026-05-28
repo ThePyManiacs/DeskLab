@@ -8,9 +8,13 @@ import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 from pygame import Surface
+from desklab._check import type_check, value_check, EndsWithValidationRule, EqualsValidationRule
 # fmt: on
 
+_valid_image_formats = (".png", ".jpg", ".jpeg", ".bmp", ".gif")
 
+
+@type_check
 class Image(DisplayableEntity, ContainableEntity, CopiableEntity):
 
     def __init__(self, image: str | np.ndarray) -> None:
@@ -20,21 +24,22 @@ class Image(DisplayableEntity, ContainableEntity, CopiableEntity):
 
     def get_matrix(self) -> np.ndarray: return self.__image_matrix
 
+    @value_check(image_path=EndsWithValidationRule(_valid_image_formats, f"Image format must be one of {_valid_image_formats}"))
     def __extract_image_data_from_path(self, image_path: str) -> np.ndarray:
-        if not image_path.lower().endswith((".png", ".jpg", ".jpeg", ".bmp", ".gif")):
-            raise ValueError(f"Unsupported file format: {image_path}")
-
         img = PilImage.open(image_path).convert("RGB")
         return np.array(img)
+
+    @value_check(image_ndim=EqualsValidationRule(3, "Image must have 3 dimensions"),
+                 image_color_channels=EqualsValidationRule(3, "Image must have 3 color channels"))
+    def __validate_dimensions(self, image_ndim: int, image_color_channels: int) -> None:
+        pass
 
     def __set_image_surface(self, image: str | np.ndarray) -> None:
 
         if isinstance(image, str):
             image = self.__extract_image_data_from_path(image)
 
-        if image.ndim != 3 or image.shape[2] != 3:
-            raise ValueError("Image must be RGB (H, W, 3)")
-
+        self.__validate_dimensions(image.ndim, image.shape[2])
         image = np.transpose(image, (1, 0, 2))
         image = np.ascontiguousarray(image)
 

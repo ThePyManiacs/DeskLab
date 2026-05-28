@@ -1,8 +1,11 @@
 from desklab.entity_types import Entity, ContainableEntity
 from ._constants import VerticalAlignment, HorizontalAlignment, FlexDirection
 from ._flexbox_interface import FlexBoxInterface
+from desklab.exceptions import ContainerBoundsExceeded
+from desklab._check import type_check
 
 
+@type_check
 class ProtectedFlexBox(FlexBoxInterface):
 
     def __get_main_dimension(self, entity: ContainableEntity) -> int:
@@ -59,10 +62,10 @@ class ProtectedFlexBox(FlexBoxInterface):
             main_axis, secondary_axis = secondary_axis, main_axis
 
         if main_sum + total_space_between > main_limit:
-            raise ValueError(f"ERROR: children exceed {main_axis} limit")
+            raise ContainerBoundsExceeded(self.__class__.__name__)
 
         if secondary_max > cross_limit:
-            raise ValueError(f"ERROR: children exceed {secondary_axis} limit")
+            raise ContainerBoundsExceeded(self.__class__.__name__)
 
     def __calculate_free_space(self, main_dimension_sum: int, total_space_between: int):
         return (self.__get_main_dimension(self) -

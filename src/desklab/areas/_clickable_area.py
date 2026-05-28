@@ -20,10 +20,7 @@ class ClickableArea(RectangularArea, EventSensitiveEntity):
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
         super().handle_event(*args, **kwargs)
-        mouse = kwargs.get("mouse")
-        if not isinstance(mouse, Mouse):
-            self._raise_for_missing_parameter("mouse", Mouse.__name__)
-
+        mouse = self._get_from_kwargs(Mouse, kwargs)
         inside = self.contains(mouse.get_position())
 
         self.__is_clicked = mouse.is_clicked() and inside

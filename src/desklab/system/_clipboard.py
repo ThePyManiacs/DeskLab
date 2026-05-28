@@ -2,6 +2,7 @@
 from abc import ABC, abstractmethod
 from typing import no_type_check
 from desklab.media import Image
+from desklab._check import type_check
 from ._system_input import SystemInput
 from typing import Optional, List, Final, no_type_check
 from PIL import Image as PilImage
@@ -24,10 +25,6 @@ class _ClipBoardBackend(ABC):
     _FILE_FORMAT: Final = "text/uri-list" if os.name != 'nt' else "FileNameW"
     _BMP_FORMAT: Final = "image/bmp"
 
-    def __raise_not_implemented_error(self, method_name: str) -> None:
-        error = f"method '{method_name}' can't be called directly from {self.__class__.__name__}"
-        raise NotImplementedError(error)
-
     def has_text(self) -> bool:
         if pyperclip.paste():
             return True
@@ -35,11 +32,11 @@ class _ClipBoardBackend(ABC):
 
     @abstractmethod
     def has_files(self) -> bool:
-        self.__raise_not_implemented_error("has_files")
+        pass
 
     @abstractmethod
     def has_image(self) -> bool:
-        self.__raise_not_implemented_error("has_image")
+        pass
 
     def put_text(self, text: str) -> None:
         try:
@@ -51,11 +48,11 @@ class _ClipBoardBackend(ABC):
 
     @abstractmethod
     def put_files(self, file_paths: List[str]) -> None:
-        self.__raise_not_implemented_error("put_files")
+        pass
 
     @abstractmethod
     def put_image(self, image: np.ndarray) -> None:
-        self.__raise_not_implemented_error("put_image")
+        pass
 
     def get_text(self) -> str:
         text = pyperclip.paste()
@@ -69,15 +66,15 @@ class _ClipBoardBackend(ABC):
 
     @abstractmethod
     def get_files(self) -> List[str]:
-        self.__raise_not_implemented_error("get_files")
+        pass
 
     @abstractmethod
     def get_image(self) -> Optional[Image]:
-        self.__raise_not_implemented_error("get_image")
+        pass
 
     @abstractmethod
     def clear(self) -> None:
-        self.__raise_not_implemented_error("clear")
+        pass
 
     def _search_paths_within_clipboard_text(self) -> list[str]:
         text_content = self.get_text()
@@ -248,6 +245,7 @@ class _MacOsClipBoardBackend(_ClipBoardBackend):
         subprocess.run(args, check=False)
 
 
+@type_check
 class ClipBoard(SystemInput):
 
     def __init__(self) -> None:

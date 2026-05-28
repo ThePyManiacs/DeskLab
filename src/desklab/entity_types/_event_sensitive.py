@@ -1,13 +1,28 @@
 from ._entity import Entity
 from abc import abstractmethod
-from typing import Any
+from typing import Any, Literal, Optional, Type, TypeVar, overload
+from desklab.exceptions import MissingParameters
+from desklab._check import type_check
+
+T = TypeVar("T")
 
 
+@type_check
 class EventSensitiveEntity(Entity):
     @abstractmethod
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
         pass
 
-    def _raise_for_missing_parameter(self, parameter_key: str, parameter_class_name: str):
-        error = f"Expected a {parameter_class_name} instance in kwargs with key '{parameter_key}'"
-        raise RuntimeError(error)
+    @overload
+    def _get_from_kwargs(self, _type: Type[T], kwargs: dict[str, Any], _raise: Literal[True] = True) -> T:
+        pass
+
+    @overload
+    def _get_from_kwargs(self, _type: Type[T], kwargs: dict[str, Any], _raise: Literal[False]) -> Optional[T]:
+        pass
+
+    def _get_from_kwargs(self, _type: Type[T], kwargs: dict[str, Any], _raise: bool = True) -> Optional[T]:
+        value = kwargs.get(_type.__name__.lower())
+        if not isinstance(value, _type) and _raise:
+            raise MissingParameters([_type.__name__.lower()])
+        return value

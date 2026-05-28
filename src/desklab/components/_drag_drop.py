@@ -1,14 +1,16 @@
 # fmt: off
 from desklab.primitives import Color
-from typing import Any
+from typing import Any, Optional
 from desklab.system import Mouse
 from desklab.containers import FlexBox, FlexDirection, HorizontalAlignment, VerticalAlignment
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame.event import Event
+from desklab._check import type_check
 # fmt: on
 
 
+@type_check
 class DragDrop(FlexBox):
 
     def __init__(self,
@@ -30,10 +32,8 @@ class DragDrop(FlexBox):
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
         super().handle_event(*args, **kwargs)
-        mouse = kwargs.get("mouse")
-        event = kwargs.get("event")
-        if not isinstance(mouse, Mouse):
-            self._raise_for_missing_parameter("mouse", Mouse.__name__)
+        mouse = self._get_from_kwargs(Mouse, kwargs)
+        event = self._get_from_kwargs(Event, kwargs, _raise=False)
         if event:
             self.__add_file_drop_listener(event, mouse)
 
@@ -45,9 +45,9 @@ class DragDrop(FlexBox):
     def get_files(self) -> list[str]:
         return self.__files.copy()
 
-    def pop_file(self) -> str:
+    def pop_file(self) -> Optional[str]:
         if not self.__files:
-            raise IndexError("No files to pop")
+            return None
         return self.__files.pop()
 
     def clear_files(self) -> None:

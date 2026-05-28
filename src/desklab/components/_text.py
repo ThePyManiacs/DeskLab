@@ -5,9 +5,12 @@ from typing import Any, Optional, Self
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import Surface
+from desklab._check import type_check
+from desklab.exceptions import MissingParameters
 # fmt: on
 
 
+@type_check
 class Text(ClickableArea):
 
     __MAX_WIDTH_DEFAULT_VALUE = 150000
@@ -75,8 +78,8 @@ class Text(ClickableArea):
 
     def fitted_within(self, max_width: Optional[int] = None, max_height: Optional[int] = None) -> Self:
         if max_width is None and max_height is None:
-            error = "'maximize' expects at least one of the following parameters: max_width, max_height"
-            raise ValueError(error)
+            error = "At least one of 'max_width' or 'max_height' must be provided."
+            raise MissingParameters(["max_width", "max_height"], error)
         if max_width is None:
             max_width = self.__MAX_WIDTH_DEFAULT_VALUE
         if max_height is None:

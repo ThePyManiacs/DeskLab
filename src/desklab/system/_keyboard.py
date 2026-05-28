@@ -1,5 +1,7 @@
 # fmt: off
 from ._system_input import SystemInput
+from desklab.exceptions import InvalidParameterValue
+from desklab._check import type_check
 from typing import Optional, Set
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -20,11 +22,12 @@ class _PygameKeyMapper:
         "esc": [K_ESCAPE],
         "enter": [K_RETURN],
         " ": [K_SPACE],
+        "space": [K_SPACE],
         "backspace": [K_BACKSPACE],
         "tab": [K_TAB],
         "shift": [K_LSHIFT, K_RSHIFT],
         "ctrl": [K_LCTRL, K_RCTRL],
-        "alt": [K_LALT, K_RALT],
+        "alt": [K_LALT, K_RALT]
     }
 
     def __init__(self) -> None:
@@ -50,10 +53,12 @@ class _PygameKeyMapper:
         if key_value := self.__key_map.get(lower_key_name):
             return [key_value]
 
-        error = f"{key_name} is not recognised as a valid key name"
-        raise ValueError(error)
+        rule = (f"'key' value must be a valid key name." +
+                f" Valid keys include single characters like 'a', '1', '-'; and special keys like 'enter', 'space', 'ctrl', etc.")
+        raise InvalidParameterValue("key", key_name, rule)
 
 
+@type_check
 class KeyBoard(SystemInput):
     def __init__(self) -> None:
         self.__event: Optional[Event] = None

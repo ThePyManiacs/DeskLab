@@ -1,5 +1,5 @@
 from desklab.system import Mouse
-from desklab.areas import Area
+from desklab.areas import AreaInterface
 from typing import Any, Callable
 from ._protected_listener import ProtectedListener
 
@@ -7,7 +7,7 @@ from ._protected_listener import ProtectedListener
 class HoverListener(ProtectedListener):
 
     def __init__(self,
-                 area: Area,
+                 area: AreaInterface,
                  actions: Callable[..., Any] | list[Callable[..., Any]],
                  aditional_conditions: Callable[...,
                                                 Any] | list[Callable[..., Any]] = [],
@@ -23,9 +23,7 @@ class HoverListener(ProtectedListener):
                          actions, on_change, listen_once)
 
     def __hover(self, *args: Any, **kwargs: Any) -> bool:
-        mouse = kwargs.get("mouse")
-        if not isinstance(mouse, Mouse):
-            self._raise_for_missing_parameter("mouse", Mouse.__name__)
+        mouse = self._get_from_kwargs(Mouse, kwargs)
         return self.__area.contains(mouse.get_position())
 
     def _get_copy_replacement_map(self) -> dict[str, Any]:

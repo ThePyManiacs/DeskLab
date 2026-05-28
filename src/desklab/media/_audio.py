@@ -5,9 +5,12 @@ from io import BytesIO
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
+from desklab.exceptions import BytesReadingError
+from desklab._check import type_check
 # fmt: on
 
 
+@type_check
 class Audio:
 
     def __init__(self, audio: str | BytesIO) -> None:
@@ -19,8 +22,7 @@ class Audio:
         try:
             self.__sound = pygame.mixer.Sound(audio)
         except pygame.error as e:
-            error = f"ERROR: Unnable to resolve sound effect file. {e}"
-            raise RuntimeError(error)
+            raise BytesReadingError(str(e))
 
     def play(self, loops: int = 1):
         self.__sound.play(loops)

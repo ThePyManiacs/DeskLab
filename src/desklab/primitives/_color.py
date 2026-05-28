@@ -1,56 +1,37 @@
-import logging
-from typing import Literal
+from desklab._check import type_check, value_check, ValidationRule, RangeValidationRule, LengthValidationRule
+from typing import Literal, Self
 import colorsys
 
-
-class _ColorMap:
-
-    __color_map: dict[str, tuple[int, int, int]] = {
-        "BLACK": (0, 0, 0),
-        "DARK_GRAY": (64, 64, 64),
-        "GRAY": (128, 128, 128),
-        "LIGHT_GRAY": (192, 192, 192),
-        "WHITE": (255, 255, 255),
-        "MAROON": (128, 0, 0),
-        "RED": (255, 0, 0),
-        "BROWN": (165, 42, 42),
-        "ORANGE": (255, 165, 0),
-        "GOLD": (255, 215, 0),
-        "YELLOW": (255, 255, 0),
-        "OLIVE": (128, 128, 0),
-        "LIME": (0, 255, 0),
-        "GREEN": (0, 255, 0),
-        "TEAL": (0, 128, 128),
-        "TURQUOISE": (64, 224, 208),
-        "CYAN": (0, 255, 255),
-        "NAVY": (0, 0, 128),
-        "BLUE": (0, 0, 255),
-        "INDIGO": (75, 0, 130),
-        "PURPLE": (128, 0, 128),
-        "MAGENTA": (200, 0, 100),
-        "VIOLET": (238, 130, 238),
-        "PINK": (255, 192, 203),
-        "SILVER": (192, 192, 192),
-    }
-
-    __default_color = "WHITE"
-
-    @classmethod
-    def get(cls, color: str) -> tuple[int, int, int]:
-        try:
-            return cls.__color_map[color.upper().strip()]
-
-        except KeyError:
-            warning = (f"\nWARNING: Invalid color {color} will be defaulted to {cls.__default_color}."
-                       f"\n         Please replace the given value with a valid one, acording to the availuable color map.\n")
-            logging.warning(warning)
-            return cls.__color_map["WHITE"]
-
-    @classmethod
-    def get_options(cls) -> list[str]:
-        return list(cls.__color_map.keys())
+_color_map: dict[str, tuple[int, int, int]] = {
+    "BLACK": (0, 0, 0),
+    "DARK_GRAY": (64, 64, 64),
+    "GRAY": (128, 128, 128),
+    "LIGHT_GRAY": (192, 192, 192),
+    "WHITE": (255, 255, 255),
+    "MAROON": (128, 0, 0),
+    "RED": (255, 0, 0),
+    "BROWN": (165, 42, 42),
+    "ORANGE": (255, 165, 0),
+    "GOLD": (255, 215, 0),
+    "YELLOW": (255, 255, 0),
+    "OLIVE": (128, 128, 0),
+    "LIME": (0, 255, 0),
+    "GREEN": (0, 255, 0),
+    "TEAL": (0, 128, 128),
+    "TURQUOISE": (64, 224, 208),
+    "CYAN": (0, 255, 255),
+    "NAVY": (0, 0, 128),
+    "BLUE": (0, 0, 255),
+    "INDIGO": (75, 0, 130),
+    "PURPLE": (128, 0, 128),
+    "MAGENTA": (200, 0, 100),
+    "VIOLET": (238, 130, 238),
+    "PINK": (255, 192, 203),
+    "SILVER": (192, 192, 192),
+}
 
 
+@type_check
 class Color:
 
     __DEFAULT_DELTA = 5
@@ -65,33 +46,34 @@ class Color:
             return self == self.__class__(other)
         return NotImplemented
 
-    def copy(self) -> "Color":
+    def copy(self) -> Self:
         return self.__class__(self.get_tuple())
 
+    @value_check(color=ValidationRule(lambda c: c in _color_map, f"Valid colors are {list(_color_map.keys())}"))
+    def __search_tuple(self, color: str) -> tuple[int, int, int]:
+        return _color_map[color.upper().strip()]
+
+    @value_check(value=RangeValidationRule(0, 255, variable_name="color channel"))
     def __assert_in_range(self, value: int) -> None:
-        if not (0 <= value <= 255):
-            error = "ERROR: Color value must be between 0 and 255."
-            raise ValueError(error)
+        pass
 
     def __set_color(self, color: tuple[int, ...] | str):
         if isinstance(color, str):
             color = self.__get_tuple_from_color_name(color)
         self.__set_tuple(color)
 
+    @value_check(color=LengthValidationRule(3, variable_name="color tuple"))
     def __set_tuple(self, color: tuple[int, ...]):
-        if len(color) != 3:
-            error = "ERROR: Color tuple must have exactly 3 values (R, G, B)."
-            raise ValueError(error)
         for channel in color:
             self.__assert_in_range(channel)
         self.__tuple = color
 
-    def __get_tuple_from_color_name(self, color: str):
+    def __get_tuple_from_color_name(self, color: str) -> tuple[int, ...]:
 
         positive_count = color.count("+")
         negative_count = color.count("-")
         raw_color = color.replace("+", "").replace("-", "")
-        color_tuple = _ColorMap.get(raw_color)
+        color_tuple = self.__search_tuple(raw_color)
 
         for _ in range(positive_count):
             color_tuple = self.__alter_brightness(self.__DEFAULT_DELTA, "+")
@@ -99,7 +81,8 @@ class Color:
             color_tuple = self.__alter_brightness(self.__DEFAULT_DELTA, "-")
         return color_tuple
 
-    def __alter_brightness(self, intensity: int, operation: Literal["+", "-"]) -> tuple[int, int, int]:
+    @value_check(operation=ValidationRule(lambda op: op in ["+", "-"], "Operation must be either '+' or '-'"))
+    def __alter_brightness(self, intensity: int, operation: Literal["+", "-"]) -> tuple[int, ...]:
 
         r, g, b = self.__tuple
 
@@ -112,11 +95,8 @@ class Color:
 
         if operation == "+":
             lightness += (1 - lightness) * amount
-        elif operation == "-":
-            lightness *= (1 - amount)
         else:
-            error = "ERROR: Operation must be either '+' or '-'."
-            raise ValueError(error)
+            lightness *= (1 - amount)
 
         lightness = max(0, min(1, lightness))
         r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
@@ -145,9 +125,9 @@ class Color:
         new_tuple = self.__alter_brightness(intensity, "+")
         return Color(new_tuple)
 
-    def get_tuple(self) -> tuple[int, int, int]:
+    def get_tuple(self) -> tuple[int, ...]:
         return self.__tuple
 
     @classmethod
     def get_options(cls) -> list[str]:
-        return _ColorMap.get_options()
+        return list(_color_map.keys())

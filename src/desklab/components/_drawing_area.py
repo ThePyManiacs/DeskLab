@@ -4,6 +4,7 @@ from enum import Enum
 from desklab.entity_types import EventSensitiveEntity
 from desklab.areas import ClickableArea
 from desklab.primitives import Color
+from desklab._check import type_check, value_check, RangeValidationRule
 from desklab.system import Mouse
 from typing import Any, Self
 import os
@@ -24,6 +25,7 @@ class _ExecutionState(Enum):
     RUNNING = 1
 
 
+@type_check
 class DrawingArea(ClickableArea, EventSensitiveEntity):
 
     def __init__(self,
@@ -108,11 +110,13 @@ class DrawingArea(ClickableArea, EventSensitiveEntity):
         copy._put_canvas(self.__canvas)
         return copy
 
+    @value_check(width=RangeValidationRule(min_value=0, variable_name="width"))
     def set_brush_width(self, width: int):
-        self.__brush_width = self._ensure_not_negative(width)
+        self.__brush_width = width
 
+    @value_check(width=RangeValidationRule(min_value=0, variable_name="width"))
     def set_eraser_width(self, width: int):
-        self.__eraser_width = self._ensure_not_negative(width)
+        self.__eraser_width = width
 
     def set_brush_color(self, color: Color | tuple[int, int, int] | str = "BLACK"):
         if isinstance(color, Color):
@@ -131,13 +135,8 @@ class DrawingArea(ClickableArea, EventSensitiveEntity):
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
         super().handle_event(*args, **kwargs)
-        mouse = kwargs.get("mouse")
-
-        if not isinstance(mouse, Mouse):
-            self._raise_for_missing_parameter("mouse", Mouse.__name__)
-
+        mouse = self._get_from_kwargs(Mouse, kwargs)
         self.__current_mouse_pos = mouse.get_position()
-
         self.__update_execution_state()
 
         if self.is_paused():

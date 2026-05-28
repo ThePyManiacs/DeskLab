@@ -1,8 +1,10 @@
 from typing import Callable, Any, Type
 from desklab.system import SystemInput
 from ._protected_listener import ProtectedListener
+from desklab._check import type_check
 
 
+@type_check
 class SystemListener(ProtectedListener):
 
     _condition_function: str = ""
@@ -21,11 +23,7 @@ class SystemListener(ProtectedListener):
                          actions, on_change, listen_once)
 
     def _check_condition(self, **kwargs: Any) -> bool:
-        class_name = self._system_input_class.__name__
-        system_input = kwargs.get(class_name.lower())
-        if not isinstance(system_input, self._system_input_class):
-            self._raise_for_missing_parameter(class_name,
-                                              self._system_input_class.__name__)
+        system_input = self._get_from_kwargs(self._system_input_class, kwargs)
         method = getattr(system_input, self._condition_function)
         try:
             return bool(method(**kwargs))

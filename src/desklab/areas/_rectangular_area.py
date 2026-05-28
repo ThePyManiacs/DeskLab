@@ -1,6 +1,7 @@
 # fmt: off
+from desklab._check import type_check, value_check, RangeValidationRule, LengthValidationRule
 from desklab._utils import is_inside_circle
-from ._interface import Area
+from ._area_interface import AreaInterface
 from desklab.primitives import Color
 from typing import Any
 import os
@@ -10,7 +11,8 @@ from pygame import Surface
 # fmt: on
 
 
-class RectangularArea(Area):
+@type_check
+class RectangularArea(AreaInterface):
 
     def __init__(self,
                  width: int,
@@ -20,20 +22,22 @@ class RectangularArea(Area):
         super().__init__(width, height, color)
         self.set_corners_radius(corners_radius)
 
+    @value_check(corners_radius=RangeValidationRule(min_value=0, variable_name="corners_radius"))
+    def __validate_corners_range(self, corners_radius: tuple[int, ...]) -> None:
+        pass
+
+    @value_check(corners_radius=LengthValidationRule(reference_length=4, comparison="=", variable_name="corners_radius"))
+    def __validate_corners_length(self, corners_radius: tuple[int, ...]) -> None:
+        pass
+
     def set_corners_radius(self, corners_radius: tuple[int, int, int, int] | int) -> None:
         if isinstance(corners_radius, int):
             corners = (corners_radius, ) * 4
         else:
             corners = corners_radius
 
-        if any(c < 0 for c in corners):
-            error = "corners_radius only accepts positive values"
-            raise ValueError(error)
-
-        if len(corners) != 4:
-            error = "corners_radius must have exactly four (4) positive integers."
-            raise ValueError()
-
+        self.__validate_corners_length(corners)
+        self.__validate_corners_range(corners)
         self.__set_corners_radius(corners)
 
     def __set_corners_radius(self, corners: tuple[int, ...]) -> None:
@@ -67,8 +71,6 @@ class RectangularArea(Area):
         ]
 
         for corner_radius, arc_center_x, arc_center_y, check_left, check_top in corners_geometry_map:
-            if corner_radius <= 0:
-                continue
 
             if self.__is_point_inside_corner_bounding_box(coordinates, arc_center_x, arc_center_y, check_left, check_top):
                 if not is_inside_circle(coordinates, (arc_center_x, arc_center_y), corner_radius):

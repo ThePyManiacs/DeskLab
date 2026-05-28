@@ -3,17 +3,20 @@ from ._constants import VerticalAlignment, HorizontalAlignment, FlexDirection
 from abc import abstractmethod
 from typing import Any, Callable, Optional, Union, Self, TypeVar
 from desklab.areas import RectangularArea
+from desklab.exceptions import ContainerBoundsExceeded
 from desklab.entity_types import Entity, ContainableEntity, DisplayableEntity, EventSensitiveEntity, CopiableEntity
 from desklab.primitives import Color
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import Surface
+from desklab._check import type_check
 # fmt: on
 
 
 T = TypeVar("T")
 
 
+@type_check
 class FlexBoxInterface(RectangularArea, EventSensitiveEntity):
     def __init__(self,
                  width: int,
@@ -96,7 +99,7 @@ class FlexBoxInterface(RectangularArea, EventSensitiveEntity):
         try:
             self.__children.extend(children)
             self._align()
-        except ValueError as error:
+        except ContainerBoundsExceeded as error:
             self.__children.clear()
             raise error
 
@@ -192,5 +195,4 @@ class FlexBoxInterface(RectangularArea, EventSensitiveEntity):
 
     @abstractmethod
     def _align(self) -> None:
-        raise NotImplementedError(
-            "ERROR: _align method must be implemented by subclasses")
+        pass

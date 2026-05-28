@@ -4,6 +4,7 @@ from desklab.system import Mouse, KeyBoard, ClipBoard
 from desklab.primitives import Color, Font
 from ._text import Text
 from typing import Any, Optional, Union, Tuple, Final
+from desklab._check import type_check, value_check, RangeValidationRule
 import re
 import time
 import os
@@ -13,6 +14,7 @@ from pygame import Surface
 # fmt: on
 
 
+@type_check
 class TextInput(ClickableArea):
 
     __MINIMUM_WIDTH: Final[int] = 30
@@ -61,16 +63,12 @@ class TextInput(ClickableArea):
         self.__last_click_time: float = 0.0
         self.__click_count: int = 0
 
+    @value_check(width=RangeValidationRule(min_value=__MINIMUM_WIDTH, variable_name="width"))
     def _set_width(self, width: int):
-        if width < self.__MINIMUM_WIDTH:
-            error = f"ERROR: minimum width for {self.__class__.__name__} is {self.__MINIMUM_WIDTH}"
-            raise ValueError(error)
         return super()._set_width(width)
 
+    @value_check(height=RangeValidationRule(min_value=__MINIMUM_HEIGHT, variable_name="height"))
     def _set_height(self, height: int):
-        if height < self.__MINIMUM_HEIGHT:
-            error = f"ERROR: minimum height for {self.__class__.__name__} is {self.__MINIMUM_HEIGHT}"
-            raise ValueError(error)
         return super()._set_height(height)
 
     def __get_width_up_to_index(self, index: int) -> int:
@@ -98,18 +96,9 @@ class TextInput(ClickableArea):
 
         super().handle_event(*args, **kwargs)
 
-        mouse = kwargs.get("mouse")
-        keyboard = kwargs.get("keyboard")
-        clipboard = kwargs.get("clipboard")
-
-        if not isinstance(mouse, Mouse):
-            self._raise_for_missing_parameter("mouse", Mouse.__name__)
-
-        if not isinstance(keyboard, KeyBoard):
-            self._raise_for_missing_parameter("keyboard", KeyBoard.__name__)
-
-        if not isinstance(clipboard, ClipBoard):
-            self._raise_for_missing_parameter("clipboard", ClipBoard.__name__)
+        mouse = self._get_from_kwargs(Mouse, kwargs)
+        keyboard = self._get_from_kwargs(KeyBoard, kwargs)
+        clipboard = self._get_from_kwargs(ClipBoard, kwargs)
 
         self.__handle_focus(mouse)
         if not self.__is_focused:

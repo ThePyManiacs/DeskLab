@@ -1,9 +1,11 @@
 import os
 from typing import Any, Optional
 from desklab.entity_types._copiable import CopiableEntity
+from desklab._check import type_check, value_check, RangeValidationRule
 import pygame
 
 
+@type_check
 class Font(CopiableEntity):
 
     __FONT_MAP: dict[str, list[str]] = {
@@ -30,8 +32,8 @@ class Font(CopiableEntity):
         self.__font.set_bold(bold)
         self.__font.set_italic(italic)
 
+    @value_check(size=RangeValidationRule(MIN_FONT_SIZE, MAX_FONT_SIZE))
     def set_size(self, size: int) -> None:
-        self.__assert_size_within_bounds(size)
         self.__size = size
         self.__font = pygame.font.Font(self.__font_path, size)
 
@@ -42,14 +44,8 @@ class Font(CopiableEntity):
     def set_bold_status(self, bold: bool) -> None:
         self.__font.set_bold(bold)
 
-    def set_italic_status(
-        self, italic: bool) -> None: self.__font.set_italic(italic)
-
-    def __assert_size_within_bounds(self, size: int) -> None:
-        if self.MIN_FONT_SIZE <= size <= self.MAX_FONT_SIZE:
-            return
-        error = f"'size' must have a value between {self.MIN_FONT_SIZE} and {self.MAX_FONT_SIZE}"
-        raise ValueError(error)
+    def set_italic_status(self, italic: bool) -> None:
+        self.__font.set_italic(italic)
 
     def measure_text(self, text: str) -> tuple[int, int]:
         return self.__font.size(text)

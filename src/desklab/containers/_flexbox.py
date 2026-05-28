@@ -2,10 +2,12 @@ from desklab.entity_types import Entity
 from typing import Callable, Optional, Union, TypeVar
 from ._constants import VerticalAlignment, HorizontalAlignment, FlexDirection
 from ._protected_flexbox import ProtectedFlexBox
+from desklab._check import type_check
 
 T = TypeVar("T")
 
 
+@type_check
 class FlexBox(ProtectedFlexBox):
 
     def get_children(self) -> list[Entity]: return self._get_children()

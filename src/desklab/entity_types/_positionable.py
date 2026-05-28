@@ -1,7 +1,9 @@
 from ._entity import Entity
 from typing import Any
+from desklab._check import type_check
 
 
+@type_check
 class PositionableEntity(Entity):
 
     def __init__(self, x: int = 0, y: int = 0, **kwargs: Any):

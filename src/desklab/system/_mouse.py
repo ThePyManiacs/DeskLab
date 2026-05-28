@@ -6,9 +6,11 @@ import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame.event import Event
 from pygame.constants import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION, DROPFILE
+from desklab._check import type_check
 # fmt: on
 
 
+@type_check
 class Mouse(SystemInput):
 
     def __init__(self) -> None:
