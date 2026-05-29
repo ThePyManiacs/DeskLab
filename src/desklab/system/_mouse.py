@@ -1,5 +1,5 @@
 # fmt: off
-from typing import Optional
+from typing import Any, Optional
 from ._system_input import SystemInput
 from pynput import mouse
 import os
@@ -55,8 +55,9 @@ class Mouse(SystemInput):
     def is_dropping_file(self) -> bool:
         return self.__matches_current_event(DROPFILE)
 
-    def __position_listener(self, x: int, y: int) -> None:
-        self.__position = (x - self.__refference_x, y - self.__refference_y)
+    def __position_listener(self, x: int | float, y: int | float, *args: Any) -> None:
+        self.__position = (int(x - self.__refference_x),
+                           int(y - self.__refference_y))
 
     def __activate_listeners(self) -> None:
         self._listener = mouse.Listener(on_move=self.__position_listener)
