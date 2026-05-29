@@ -50,7 +50,7 @@ class MissingParameters(DeskLabError):
 
 class ContainerBoundsExceeded(DeskLabError):
     def __init__(self, container_name: str) -> None:
-        error = f"Children exceeded bounds limit in '{container_name}'"
+        error = f"Children exceeded bounds in '{container_name}'"
         super().__init__(error)
 
 
