@@ -44,6 +44,7 @@ class Window(FlexBox):
         pygame.display.set_icon(pygame.image.load(icon))
         pygame.init()
         cls.__screen = pygame.display.set_mode((width, height))
+        cls.__alpha_surface = pygame.Surface((width, height), pygame.SRCALPHA)
         cls.__clock = pygame.time.Clock()
         cls.__width = width
         cls.__height = height
@@ -88,8 +89,11 @@ class Window(FlexBox):
                                   screen=self.__screen)
 
             self.__screen.fill((0, 0, 0))
+            self.__alpha_surface.fill((0, 0, 0, 255))
 
-            self.display(self.__screen)
+            self.display(self.__alpha_surface)
+
+            self.__screen.blit(self.__alpha_surface, (0, 0))
 
             pygame.display.update()
             self.__clock.tick(60)
