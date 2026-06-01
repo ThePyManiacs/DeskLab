@@ -1,41 +1,56 @@
 # fmt: off
 import subprocess
-from imageio_ffmpeg import get_ffmpeg_exe  # type: ignore
-from io import BytesIO
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
+from desklab._check import value_check, CheckRange
+from desklab._utils import get_ffmpeg_exe
 from desklab.exceptions import BytesReadingError
-
 # fmt: on
 
 
 class Audio:
 
-    def __init__(self, audio: str | BytesIO) -> None:
+    __ffmpeg: str = str(get_ffmpeg_exe())
+
+    def __init__(self, audio: str | bytes) -> None:
+        self.__sound: pygame.mixer.Sound
         self.set(audio)
 
-    def set(self, audio: str | BytesIO):
+    def set(self, audio: str | bytes) -> None:
         if isinstance(audio, str):
-            audio = self.__convert_to_wav(audio)
+            audio_buffer: bytes = self.__convert_to_wav(audio)
+        else:
+            audio_buffer = audio
+
         try:
-            self.__sound = pygame.mixer.Sound(audio)
-        except pygame.error as e:
-            raise BytesReadingError(str(e))
+            if not pygame.mixer.get_init():
+                pygame.mixer.init()
+            self.__sound = pygame.mixer.Sound(audio_buffer)
+        except (pygame.error, ValueError) as e:
+            raise BytesReadingError(f"Failed to read audio source: {e}")
 
-    def play(self, loops: int = 1):
-        self.__sound.play(loops)
+    @value_check(loops=CheckRange(-1, variable_name="loops"))
+    def play(self, loops: int = 1) -> None:
+        loops = loops - 1 if loops > 0 else loops
+        self.__sound.play(loops=loops)
 
-    def __convert_to_wav(self, audio: str) -> BytesIO:
-        ffmpeg = get_ffmpeg_exe()
+    def stop(self) -> None:
+        self.__sound.stop()
 
-        process = subprocess.run([ffmpeg, "-i", audio, "-ac", "1",
-                                  "-ar", "16000", "-sample_fmt", "s16",
-                                  "-f", "wav", "-"],
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.DEVNULL,
-                                 check=True)
-
-        wav_buffer = BytesIO(process.stdout)
-        wav_buffer.seek(0)
-        return wav_buffer
+    def __convert_to_wav(self, audio_path: str) -> bytes:
+        try:
+            process = subprocess.run(
+                [
+                    self.__ffmpeg, "-y", "-i", audio_path,
+                    "-ac", "1", "-ar", "16000",
+                    "-sample_fmt", "s16", "-f", "wav", "-"
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=True
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError) as e:
+            error = f"Conversion to .wav failed for '{audio_path}': {e}"
+            raise BytesReadingError(error)
+        return process.stdout
