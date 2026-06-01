@@ -5,11 +5,10 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 from pygame import Surface
 from desklab.entity_types import DisplayableEntity, ContainableEntity, CopiableEntity
-from desklab._check import type_check, value_check, RangeValidationRule
+from desklab._check import value_check, CheckRange
 # fmt: on
 
 
-@type_check
 class Image(DisplayableEntity, ContainableEntity, CopiableEntity):
 
     @overload
@@ -40,7 +39,7 @@ class Image(DisplayableEntity, ContainableEntity, CopiableEntity):
     def __get_surface(self) -> Surface:
         return self.__image_surface.copy()
 
-    @value_check(percentage=RangeValidationRule(0, variable_name="percentage"))
+    @value_check(percentage=CheckRange(0, variable_name="percentage"))
     def rescaled(self, percentage: float) -> Self:
         new_width = int(self.get_width() * percentage)
         new_height = int(self.get_height() * percentage)
@@ -48,8 +47,8 @@ class Image(DisplayableEntity, ContainableEntity, CopiableEntity):
                                              (new_width, new_height))
         return self.copy(image_source=new_surface)
 
-    @value_check(width=RangeValidationRule(0, variable_name="width"),
-                 height=RangeValidationRule(0, variable_name="height"))
+    @value_check(width=CheckRange(0, variable_name="width"),
+                 height=CheckRange(0, variable_name="height"))
     def resized(self, width: int, height: int) -> Self:
         new_surface = pygame.transform.scale(self.__get_surface(),
                                              (width, height))

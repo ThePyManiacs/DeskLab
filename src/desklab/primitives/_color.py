@@ -1,4 +1,4 @@
-from desklab._check import type_check, value_check, ValidationRule, RangeValidationRule
+from desklab._check import value_check, Check, CheckRange
 from typing import Literal, Self
 import colorsys
 
@@ -31,7 +31,6 @@ _color_map: dict[str, tuple[int, ...]] = {
 }
 
 
-@type_check
 class Color:
 
     __DEFAULT_DELTA = 5
@@ -49,15 +48,15 @@ class Color:
     def copy(self) -> Self:
         return self.__class__(self.get_tuple())
 
-    @value_check(color=ValidationRule(lambda c: c in _color_map, f"Valid colors are {list(_color_map.keys())}"))
+    @value_check(color=Check(lambda c: c in _color_map, f"Valid colors are {list(_color_map.keys())}"))
     def __search_tuple(self, color: str) -> tuple[int, ...]:
         return _color_map[color.upper().strip()]
 
-    @value_check(channel=RangeValidationRule(0, 255, variable_name="color channel"))
+    @value_check(channel=CheckRange(0, 255, variable_name="color channel"))
     def __validate_range(self, channel: int) -> None:
         pass
 
-    @value_check(length=RangeValidationRule(3, 4, variable_name="color tuple"))
+    @value_check(length=CheckRange(3, 4, variable_name="color tuple"))
     def __validate_length(self, length: int) -> None:
         pass
 
@@ -87,7 +86,7 @@ class Color:
             color_tuple = self.__alter_brightness(self.__DEFAULT_DELTA, "-")
         return color_tuple
 
-    @value_check(operation=ValidationRule(lambda op: op in ["+", "-"], "Operation must be either '+' or '-'"))
+    @value_check(operation=Check(lambda op: op in ["+", "-"], "Operation must be either '+' or '-'"))
     def __alter_brightness(self, intensity: int, operation: Literal["+", "-"]) -> tuple[int, ...]:
 
         r, g, b, a = self.__tuple

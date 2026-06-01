@@ -1,10 +1,10 @@
 from typing import Any
 
-from desklab._check._validation_rules import ValidationRule
+from desklab._check._check_operations import Check
 from desklab.exceptions import InvalidParameterValue
 
 
-class LengthValidationRule(ValidationRule):
+class CheckLength(Check):
 
     def __init__(self, reference_length: int, comparison: str = "=", variable_name: str | None = None) -> None:
 
