@@ -3,10 +3,8 @@ from desklab.containers import (FlexDirection, HorizontalAlignment,
                                 VerticalAlignment, FlexBox)
 from desklab.areas import ClickableArea
 from desklab.primitives import Color
-from desklab._check import type_check
 
 
-@type_check
 class Button(FlexBox, ClickableArea):
 
     def __init__(self,

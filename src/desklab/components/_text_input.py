@@ -4,7 +4,7 @@ from desklab.system import Mouse, KeyBoard, ClipBoard
 from desklab.primitives import Color, Font
 from ._text import Text
 from typing import Any, Optional, Union, Tuple, Final
-from desklab._check import type_check, value_check, RangeValidationRule
+from desklab._check import value_check, CheckRange
 import re
 import time
 import os
@@ -14,7 +14,6 @@ from pygame import Surface
 # fmt: on
 
 
-@type_check
 class TextInput(ClickableArea):
 
     __MINIMUM_WIDTH: Final[int] = 30
@@ -63,11 +62,11 @@ class TextInput(ClickableArea):
         self.__last_click_time: float = 0.0
         self.__click_count: int = 0
 
-    @value_check(width=RangeValidationRule(min_value=__MINIMUM_WIDTH, variable_name="width"))
+    @value_check(width=CheckRange(min_value=__MINIMUM_WIDTH, variable_name="width"))
     def _set_width(self, width: int):
         return super()._set_width(width)
 
-    @value_check(height=RangeValidationRule(min_value=__MINIMUM_HEIGHT, variable_name="height"))
+    @value_check(height=CheckRange(min_value=__MINIMUM_HEIGHT, variable_name="height"))
     def _set_height(self, height: int):
         return super()._set_height(height)
 

@@ -2,17 +2,13 @@
 from abc import ABC, abstractmethod
 from typing import no_type_check
 from desklab.media import Image
-from desklab._check import type_check
 from ._system_input import SystemInput
 from typing import Optional, List, Final, no_type_check
-from PIL import Image as PilImage
 from urllib.parse import quote
-import tempfile
 import subprocess
 import pyperclip
 import sys
 import io
-import numpy as np
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
@@ -48,10 +44,6 @@ class _ClipBoardBackend(ABC):
 
     @abstractmethod
     def put_files(self, file_paths: List[str]) -> None:
-        pass
-
-    @abstractmethod
-    def put_image(self, image: np.ndarray) -> None:
         pass
 
     def get_text(self) -> str:
@@ -107,12 +99,6 @@ class _DefaultClipBoardBackend(_ClipBoardBackend):
         pygame.scrap.put(self._FILE_FORMAT, data)
         self.put_text("\n".join(file_paths))
 
-    def put_image(self, image: np.ndarray) -> None:
-        temp_surface = pygame.surfarray.make_surface(image)
-        image_buffer = io.BytesIO()
-        pygame.image.save(temp_surface, image_buffer, "BMP")
-        pygame.scrap.put(self._BMP_FORMAT, image_buffer.getvalue())
-
     def get_files(self) -> List[str]:
         data = pygame.scrap.get(self._FILE_FORMAT)
         if not data:
@@ -131,19 +117,6 @@ class _DefaultClipBoardBackend(_ClipBoardBackend):
         if os.name == 'nt' and path.startswith("/") and ":" in path:
             path = path[1:]
         return path
-
-    def get_image(self) -> Optional[Image]:
-        data = pygame.scrap.get(self._BMP_FORMAT)
-        if not data:
-            return None
-        try:
-            image_buffer = io.BytesIO(data)
-            surface = pygame.image.load(image_buffer)
-            array = pygame.surfarray.array3d(surface)
-            array_for_init = np.transpose(array, (1, 0, 2))
-            return Image(image=array_for_init)
-        except pygame.error:
-            return None
 
     def clear(self) -> None:
         pygame.scrap.put(self._TEXT_FORMAT, b"")
@@ -200,19 +173,6 @@ class _MacOsClipBoardBackend(_ClipBoardBackend):
         except subprocess.CalledProcessError as e:
             print(f"Unable to copy files into MacOS clipboard: {e}")
 
-    def put_image(self, image: np.ndarray) -> None:
-        img = PilImage.fromarray(np.transpose(image, (1, 0, 2)))
-        with tempfile.NamedTemporaryFile(suffix=".tiff", delete=False) as f:
-            temp_file = f.name
-
-        try:
-            img.save(temp_file, format="TIFF")
-            script = f'set the clipboard to (read POSIX file "{temp_file}" as TIFF picture)'
-            subprocess.run(["osascript", "-e", script], check=True)
-        finally:
-            if os.path.exists(temp_file):
-                os.remove(temp_file)
-
     @no_type_check
     def get_files(self) -> List[str]:
         try:
@@ -245,7 +205,6 @@ class _MacOsClipBoardBackend(_ClipBoardBackend):
         subprocess.run(args, check=False)
 
 
-@type_check
 class ClipBoard(SystemInput):
 
     def __init__(self) -> None:
@@ -275,17 +234,6 @@ class ClipBoard(SystemInput):
         if isinstance(files, str):
             files = [files]
         self.__backend.put_files(files)
-
-    def put_image(self, image: str | np.ndarray | Image) -> None:
-        if isinstance(image, str):
-            image = Image(image)
-        if isinstance(image, Image):
-            image = image.get_matrix()
-
-        if image.ndim == 3 and image.shape[-1] == 4:
-            image = image[:, :, :3]
-
-        self.__backend.put_image(image)
 
     def get_text(self) -> str:
         return self.__backend.get_text()

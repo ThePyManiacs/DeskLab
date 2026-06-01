@@ -1,10 +1,8 @@
 from ._entity import Entity
 from desklab.primitives import Color
 from typing import Any
-from desklab._check import type_check
 
 
-@type_check
 class ColorableEntity(Entity):
 
     def __init__(self, color: Color | tuple[int, ...] | str, **kwargs: Any) -> None:

@@ -1,10 +1,8 @@
 from typing import Callable, Any
 from desklab.entity_types import EventSensitiveEntity, CopiableEntity
 from typing import Any, Callable
-from desklab._check import type_check
 
 
-@type_check
 class ProtectedListener(EventSensitiveEntity, CopiableEntity):
 
     def __init__(self,

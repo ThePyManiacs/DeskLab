@@ -1,10 +1,8 @@
 from typing import Callable, Any, Type
 from desklab.system import SystemInput
 from ._protected_listener import ProtectedListener
-from desklab._check import type_check
 
 
-@type_check
 class SystemListener(ProtectedListener):
 
     _condition_function: str = ""

@@ -2,7 +2,7 @@ from typing import Any
 from typing import Any, Callable
 
 
-class ValidationRule:
+class Check:
     def __init__(self, rule: Callable[[Any], bool], description: str | None = None) -> None:
         self.__rule = rule
         self.__description = description

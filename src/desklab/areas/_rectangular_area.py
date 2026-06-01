@@ -1,5 +1,5 @@
 # fmt: off
-from desklab._check import type_check, value_check, RangeValidationRule, LengthValidationRule
+from desklab._check import value_check, CheckRange, CheckLength
 from desklab._utils import is_inside_circle
 from ._area_interface import AreaInterface
 from desklab.primitives import Color
@@ -11,7 +11,6 @@ from pygame import Surface
 # fmt: on
 
 
-@type_check
 class RectangularArea(AreaInterface):
 
     def __init__(self,
@@ -22,11 +21,11 @@ class RectangularArea(AreaInterface):
         super().__init__(width, height, color)
         self.set_corners_radius(corners_radius)
 
-    @value_check(corners_radius=RangeValidationRule(min_value=0, variable_name="corners_radius"))
+    @value_check(corners_radius=CheckRange(min_value=0, variable_name="corners_radius"))
     def __validate_corners_range(self, corners_radius: tuple[int, ...]) -> None:
         pass
 
-    @value_check(corners_radius=LengthValidationRule(reference_length=4, comparison="=", variable_name="corners_radius"))
+    @value_check(corners_radius=CheckLength(reference_length=4, variable_name="corners_radius"))
     def __validate_corners_length(self, corners_radius: tuple[int, ...]) -> None:
         pass
 

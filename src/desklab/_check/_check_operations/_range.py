@@ -1,11 +1,11 @@
 from typing import Any
 from typing import Any, cast
 from desklab.exceptions import MissingParameters
-from desklab._check._validation_rules import ValidationRule
+from desklab._check._check_operations import Check
 from collections.abc import Iterable
 
 
-class RangeValidationRule(ValidationRule):
+class CheckRange(Check):
 
     def __init__(self, min_value: Any = None, max_value: Any = None, variable_name: str | None = None) -> None:
 

@@ -2,10 +2,8 @@ from desklab.entity_types import Entity, ContainableEntity
 from ._constants import VerticalAlignment, HorizontalAlignment, FlexDirection
 from ._flexbox_interface import FlexBoxInterface
 from desklab.exceptions import ContainerBoundsExceeded
-from desklab._check import type_check
 
 
-@type_check
 class ProtectedFlexBox(FlexBoxInterface):
 
     def __get_main_dimension(self, entity: ContainableEntity) -> int:

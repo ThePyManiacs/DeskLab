@@ -4,7 +4,7 @@ from enum import Enum
 from desklab.entity_types import EventSensitiveEntity
 from desklab.areas import ClickableArea
 from desklab.primitives import Color
-from desklab._check import type_check, value_check, RangeValidationRule
+from desklab._check import value_check, CheckRange
 from desklab.system import Mouse
 from typing import Any, Self
 import os
@@ -25,7 +25,6 @@ class _ExecutionState(Enum):
     RUNNING = 1
 
 
-@type_check
 class DrawingArea(ClickableArea, EventSensitiveEntity):
 
     def __init__(self,
@@ -110,11 +109,11 @@ class DrawingArea(ClickableArea, EventSensitiveEntity):
         copy._put_canvas(self.__canvas)
         return copy
 
-    @value_check(width=RangeValidationRule(min_value=0, variable_name="width"))
+    @value_check(width=CheckRange(min_value=0, variable_name="width"))
     def set_brush_width(self, width: int):
         self.__brush_width = width
 
-    @value_check(width=RangeValidationRule(min_value=0, variable_name="width"))
+    @value_check(width=CheckRange(min_value=0, variable_name="width"))
     def set_eraser_width(self, width: int):
         self.__eraser_width = width
 

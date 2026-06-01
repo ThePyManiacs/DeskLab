@@ -1,11 +1,10 @@
 import os
 from typing import Any, Optional
 from desklab.entity_types._copiable import CopiableEntity
-from desklab._check import type_check, value_check, RangeValidationRule
+from desklab._check import value_check, CheckRange
 import pygame
 
 
-@type_check
 class Font(CopiableEntity):
 
     __FONT_MAP: dict[str, list[str]] = {
@@ -32,7 +31,7 @@ class Font(CopiableEntity):
         self.__font.set_bold(bold)
         self.__font.set_italic(italic)
 
-    @value_check(size=RangeValidationRule(MIN_FONT_SIZE, MAX_FONT_SIZE))
+    @value_check(size=CheckRange(MIN_FONT_SIZE, MAX_FONT_SIZE, "size"))
     def set_size(self, size: int) -> None:
         self.__size = size
         self.__font = pygame.font.Font(self.__font_path, size)
