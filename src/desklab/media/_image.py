@@ -15,9 +15,12 @@ class Image(DisplayableEntity, ContainableEntity, CopiableEntity):
     def __init__(self, image_source: str) -> None: ...
 
     @overload
+    def __init__(self, image_source: bytes) -> None: ...
+
+    @overload
     def __init__(self, image_source: Surface) -> None: ...
 
-    def __init__(self, image_source: str | Surface) -> None:
+    def __init__(self, image_source: str | bytes | Surface) -> None:
         self.__load_surface(image_source)
 
         super().__init__(
@@ -25,7 +28,7 @@ class Image(DisplayableEntity, ContainableEntity, CopiableEntity):
             height=self.__image_surface.get_height()
         )
 
-    def __load_surface(self, source: str | Surface) -> None:
+    def __load_surface(self, source: str | bytes | Surface) -> None:
         if isinstance(source, Surface):
             self.__image_surface = source.copy()
         else:

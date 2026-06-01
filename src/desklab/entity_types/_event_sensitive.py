@@ -2,12 +2,11 @@ from ._entity import Entity
 from abc import abstractmethod
 from typing import Any, Literal, Optional, Type, TypeVar, overload
 from desklab.exceptions import MissingParameters
-from desklab._check import type_check
+
 
 T = TypeVar("T")
 
 
-@type_check
 class EventSensitiveEntity(Entity):
     @abstractmethod
     def handle_event(self, *args: Any, **kwargs: Any) -> None:

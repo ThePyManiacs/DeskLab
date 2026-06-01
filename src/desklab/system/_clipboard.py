@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 from typing import no_type_check
 from desklab.media import Image
-from desklab._check import type_check
+
 from ._system_input import SystemInput
 from typing import Optional, List, Final, no_type_check
 from PIL import Image as PilImage
@@ -245,7 +245,6 @@ class _MacOsClipBoardBackend(_ClipBoardBackend):
         subprocess.run(args, check=False)
 
 
-@type_check
 class ClipBoard(SystemInput):
 
     def __init__(self) -> None:

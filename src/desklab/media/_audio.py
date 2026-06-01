@@ -6,11 +6,10 @@ import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 from desklab.exceptions import BytesReadingError
-from desklab._check import type_check
+
 # fmt: on
 
 
-@type_check
 class Audio:
 
     def __init__(self, audio: str | BytesIO) -> None:

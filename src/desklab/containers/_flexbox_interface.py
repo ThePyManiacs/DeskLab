@@ -9,14 +9,13 @@ from desklab.primitives import Color
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import Surface
-from desklab._check import type_check
+
 # fmt: on
 
 
 T = TypeVar("T")
 
 
-@type_check
 class FlexBoxInterface(RectangularArea, EventSensitiveEntity):
     def __init__(self,
                  width: int,

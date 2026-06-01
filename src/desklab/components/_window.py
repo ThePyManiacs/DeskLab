@@ -10,11 +10,10 @@ import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 from importlib import resources
-from desklab._check import type_check
+
 # fmt: on
 
 
-@type_check
 class Window(FlexBox):
 
     __is_set_up = False

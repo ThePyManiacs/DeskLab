@@ -1,7 +1,7 @@
 # fmt: off
 from ._system_input import SystemInput
 from desklab.exceptions import InvalidParameterValue
-from desklab._check import type_check
+
 from typing import Optional, Set
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -58,7 +58,6 @@ class _PygameKeyMapper:
         raise InvalidParameterValue("key", key_name, rule)
 
 
-@type_check
 class KeyBoard(SystemInput):
     def __init__(self) -> None:
         self.__event: Optional[Event] = None

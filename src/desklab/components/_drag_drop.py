@@ -6,11 +6,9 @@ from desklab.containers import FlexBox, FlexDirection, HorizontalAlignment, Vert
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame.event import Event
-from desklab._check import type_check
 # fmt: on
 
 
-@type_check
 class DragDrop(FlexBox):
 
     def __init__(self,

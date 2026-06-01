@@ -5,12 +5,11 @@ from typing import Any, Optional, Self
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import Surface
-from desklab._check import type_check
+
 from desklab.exceptions import MissingParameters
 # fmt: on
 
 
-@type_check
 class Text(ClickableArea):
 
     __MAX_WIDTH_DEFAULT_VALUE = 150000
