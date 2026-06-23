@@ -27,9 +27,11 @@ class FlexBoxInterface(RectangularArea, EventSensitiveEntity):
                  vertical_alignment: str | VerticalAlignment = "CENTER",
                  corners_radius: tuple[int, int, int, int] | int = 0,
                  color: Union[Color, tuple[int, int, int], str] = "BLACK",
-                 bounded: bool = True, *args: Any, **kwargs: Any) -> None:
+                 bounded: bool = True,
+                 visible: bool = True, *args: Any, **kwargs: Any) -> None:
 
         self.__children: list[Entity] = []
+        self._visible = visible
         self._bounded = bounded
         self._padding = padding
         self._space_between = space_between
@@ -52,6 +54,8 @@ class FlexBoxInterface(RectangularArea, EventSensitiveEntity):
     def _get_space_between(self) -> int: return self._space_between
     def _get_flex_direction(self) -> FlexDirection: return self._flex_direction
     def _is_bounded(self) -> bool: return self._bounded
+    def _is_visible(self) -> bool: return self._visible
+    def _set_visibility(self, visible: bool) -> None: self._visible = visible
 
     def _get_children(self) -> list[Entity]:
         return self.__children.copy()
@@ -81,12 +85,16 @@ class FlexBoxInterface(RectangularArea, EventSensitiveEntity):
             self._set_flex_direction("COLUMN")
 
     def display(self, screen: Surface) -> None:
+        if not self._is_visible():
+            return
         super().display(screen)
         for child in self._get_children():
             if isinstance(child, DisplayableEntity):
                 child.display(screen)
 
     def handle_event(self, *args: Any, **kwargs: Any) -> None:
+        if not self._is_visible():
+            return
         super().handle_event(*args, **kwargs)
         for child in self._get_children():
             if isinstance(child, EventSensitiveEntity):
@@ -181,8 +189,8 @@ class FlexBoxInterface(RectangularArea, EventSensitiveEntity):
                 count += 1
         return count
 
-    def _is_childless(self) -> bool:
-        return not self.__children
+    def _has_children(self) -> bool:
+        return bool(self.__children)
 
     def set_x(self, x: int) -> None:
         super().set_x(x)

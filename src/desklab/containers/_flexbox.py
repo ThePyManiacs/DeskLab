@@ -13,10 +13,14 @@ class FlexBox(ProtectedFlexBox):
     def get_padding(self) -> int: return self._get_padding()
     def get_space_between(self) -> int: return self._get_space_between()
     def is_bounded(self) -> bool: return self._is_bounded()
+    def is_visible(self) -> bool: return self._is_visible()
     def switch_direction(self) -> None: self._switch_direction()
     def pop_child(self) -> Optional[Entity]: return self._pop_child()
     def clear_children(self) -> None: return self._clear_children()
     def count_children(self) -> int: return self._count_children()
+
+    def set_visibility(self, visible: bool) -> None:
+        self._set_visibility(visible)
 
     def cascade(self, function: Callable[[Entity], T]) -> list[T]:
         return self._cascade(function)
@@ -27,7 +31,7 @@ class FlexBox(ProtectedFlexBox):
     def count_containable_children(self) -> int:
         return self._count_containable_children()
 
-    def is_childless(self) -> bool: return self._is_childless()
+    def has_children(self) -> bool: return self._has_children()
 
     def get_child_index(self, entity: Entity) -> int:
         return self._get_child_index(entity)
