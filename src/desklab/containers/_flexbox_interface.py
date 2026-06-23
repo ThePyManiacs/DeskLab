@@ -26,7 +26,7 @@ class FlexBoxInterface(RectangularArea, EventSensitiveEntity):
                  horizontal_alignment: str | HorizontalAlignment = "CENTER",
                  vertical_alignment: str | VerticalAlignment = "CENTER",
                  corners_radius: tuple[int, int, int, int] | int = 0,
-                 color: Union[Color, tuple[int, int, int], str] = "BLACK",
+                 color: Union[Color, tuple[int, ...], str] = "BLACK",
                  bounded: bool = True,
                  visible: bool = True, *args: Any, **kwargs: Any) -> None:
 

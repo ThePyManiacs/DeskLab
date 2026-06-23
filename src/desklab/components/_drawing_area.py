@@ -33,7 +33,7 @@ class DrawingArea(ClickableArea, EventSensitiveEntity):
                  corners_radius: tuple[int, int, int, int] | int = 0,
                  background_color: Color | tuple[int,
                                                  int, int] | str = "WHITE",
-                 brush_color: Color | tuple[int, int, int] | str = "BLACK",
+                 brush_color: Color | tuple[int, ...] | str = "BLACK",
                  brush_width: int = 10,
                  eraser_width: int = 10) -> None:
 
@@ -117,7 +117,7 @@ class DrawingArea(ClickableArea, EventSensitiveEntity):
     def set_eraser_width(self, width: int):
         self.__eraser_width = width
 
-    def set_brush_color(self, color: Color | tuple[int, int, int] | str = "BLACK"):
+    def set_brush_color(self, color: Color | tuple[int, ...] | str = "BLACK"):
         if isinstance(color, Color):
             self.__brush_color = color
             return

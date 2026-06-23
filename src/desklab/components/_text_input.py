@@ -24,10 +24,10 @@ class TextInput(ClickableArea):
     __LEFT_MARGIN: Final[int] = 10
     __RIGHT_MARGIN: Final[int] = 20
 
-    __SELECTED_AREA_COLOR: tuple[int, int, int] = (173, 216, 230)
+    __SELECTED_AREA_COLOR: tuple[int, ...] = (173, 216, 230)
 
     __CURSOR_BLINK_SPEED: Final[float] = 0.5
-    __CURSOR_COLOR_TUPLE: tuple[int, int, int] = (0, 0, 0)
+    __CURSOR_COLOR_TUPLE: tuple[int, ...] = (0, 0, 0)
     __CURSOR_WIDTH: Final[int] = 2
     __CURSOR_VERTICAL_MARGIN: Final[int] = 5
 
@@ -35,10 +35,10 @@ class TextInput(ClickableArea):
                  width: int,
                  height: int,
                  font: Optional[Font] = None,
-                 text_color: Union[Color, Tuple[int, int, int], str] = "BLACK",
+                 text_color: Union[Color, tuple[int, ...], str] = "BLACK",
                  corners_radius: Union[Tuple[int, int, int, int], int] = 0,
                  background_color: Union[Color,
-                                         Tuple[int, int, int], str] = "WHITE") -> None:
+                                         tuple[int, ...], str] = "WHITE") -> None:
 
         super().__init__(width, height, background_color, corners_radius)
 
