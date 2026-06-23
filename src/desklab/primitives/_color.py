@@ -48,7 +48,7 @@ class Color:
     def copy(self) -> Self:
         return self.__class__(self.get_tuple())
 
-    @value_check(color=Check(lambda c: c in _color_map, f"Valid colors are {list(_color_map.keys())}"))
+    @value_check(color=Check(lambda c: c.upper() in _color_map, f"Valid colors are {list(_color_map.keys())}"))
     def __search_tuple(self, color: str) -> tuple[int, ...]:
         return _color_map[color.upper().strip()]
 
