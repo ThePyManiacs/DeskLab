@@ -11,9 +11,8 @@ from desklab.exceptions import BytesReadingError
 
 class Audio:
 
-    __ffmpeg: str = str(get_ffmpeg_exe())
-
     def __init__(self, audio: str | bytes) -> None:
+        self.__ffmpeg: str = str(get_ffmpeg_exe())
         self.__sound: pygame.mixer.Sound
         self.set(audio)
 
