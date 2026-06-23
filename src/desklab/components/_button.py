@@ -17,7 +17,7 @@ class Button(FlexBox, ClickableArea):
                  horizontal_alignment: str | HorizontalAlignment = HorizontalAlignment.CENTER,
                  vertical_alignment: str | VerticalAlignment = VerticalAlignment.CENTER,
                  corners_radius: tuple[int, int, int, int] | int = 0,
-                 color: Color | tuple[int, int, int] | str = "BLACK",
+                 color: Color | tuple[int, ...] | str = "BLACK",
                  bounded: bool = True) -> None:
 
         super().__init__(width, height, padding,

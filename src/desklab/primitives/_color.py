@@ -3,31 +3,31 @@ from typing import Literal, Self
 import colorsys
 
 _color_map: dict[str, tuple[int, ...]] = {
-    "BLACK": (0, 0, 0, 1),
-    "DARK_GRAY": (64, 64, 64, 1),
-    "GRAY": (128, 128, 128, 1),
-    "LIGHT_GRAY": (192, 192, 192, 1),
-    "WHITE": (255, 255, 255, 1),
-    "MAROON": (128, 0, 0, 1),
-    "RED": (255, 0, 0, 1),
-    "BROWN": (165, 42, 42, 1),
-    "ORANGE": (255, 165, 0, 1),
-    "GOLD": (255, 215, 0, 1),
-    "YELLOW": (255, 255, 0, 1),
-    "OLIVE": (128, 128, 0, 1),
-    "LIME": (0, 255, 0, 1),
-    "GREEN": (0, 255, 0, 1),
-    "TEAL": (0, 128, 128, 1),
-    "TURQUOISE": (64, 224, 208, 1),
-    "CYAN": (0, 255, 255, 1),
-    "NAVY": (0, 0, 128, 1),
-    "BLUE": (0, 0, 255, 1),
-    "INDIGO": (75, 0, 130, 1),
-    "PURPLE": (128, 0, 128, 1),
-    "MAGENTA": (200, 0, 100, 1),
-    "VIOLET": (238, 130, 238, 1),
-    "PINK": (255, 192, 203, 1),
-    "SILVER": (192, 192, 192, 1),
+    "BLACK": (0, 0, 0, 255),
+    "DARK_GRAY": (64, 64, 64, 255),
+    "GRAY": (128, 128, 128, 255),
+    "LIGHT_GRAY": (192, 192, 192, 255),
+    "WHITE": (255, 255, 255, 255),
+    "MAROON": (128, 0, 0, 255),
+    "RED": (255, 0, 0, 255),
+    "BROWN": (165, 42, 42, 255),
+    "ORANGE": (255, 165, 0, 255),
+    "GOLD": (255, 215, 0, 255),
+    "YELLOW": (255, 255, 0, 255),
+    "OLIVE": (128, 128, 0, 255),
+    "LIME": (0, 255, 0, 255),
+    "GREEN": (0, 255, 0, 255),
+    "TEAL": (0, 128, 128, 255),
+    "TURQUOISE": (64, 224, 208, 255),
+    "CYAN": (0, 255, 255, 255),
+    "NAVY": (0, 0, 128, 255),
+    "BLUE": (0, 0, 255, 255),
+    "INDIGO": (75, 0, 130, 255),
+    "PURPLE": (128, 0, 128, 255),
+    "MAGENTA": (200, 0, 100, 255),
+    "VIOLET": (238, 130, 238, 255),
+    "PINK": (255, 192, 203, 255),
+    "SILVER": (192, 192, 192, 255),
 }
 
 
@@ -48,7 +48,7 @@ class Color:
     def copy(self) -> Self:
         return self.__class__(self.get_tuple())
 
-    @value_check(color=Check(lambda c: c in _color_map, f"Valid colors are {list(_color_map.keys())}"))
+    @value_check(color=Check(lambda c: c.upper() in _color_map, f"Valid colors are {list(_color_map.keys())}"))
     def __search_tuple(self, color: str) -> tuple[int, ...]:
         return _color_map[color.upper().strip()]
 
