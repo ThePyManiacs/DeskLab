@@ -46,6 +46,14 @@ class Window:
         cls.__is_set_up = True
         cls.__window = PygameWindow.from_display_module()
 
+    @classmethod
+    def get_width(cls) -> int:
+        return cls.__width
+
+    @classmethod
+    def get_height(cls) -> int:
+        return cls.__height
+
     def add_layer(self,
                   padding: int = 0,
                   space_between: int = 0,
