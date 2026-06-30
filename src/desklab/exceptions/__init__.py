@@ -1,6 +1,7 @@
 from ._exceptions import (DeskLabError, InvalidParameterValue,
                           MissingParameters, ContainerBoundsExceeded,
-                          FileReadingError, BytesReadingError)
+                          FileReadingError, BytesReadingError,
+                          LogicError)
 
 __all__ = [
     'DeskLabError',
@@ -8,5 +9,6 @@ __all__ = [
     'MissingParameters',
     'ContainerBoundsExceeded',
     'FileReadingError',
-    'BytesReadingError'
+    'BytesReadingError',
+    'LogicError'
 ]

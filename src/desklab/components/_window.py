@@ -4,6 +4,7 @@ from pygame._sdl2 import Window as PygameWindow
 from desklab.system import Mouse, KeyBoard, ClipBoard
 from desklab.containers import FlexBox, FlexDirection, HorizontalAlignment, VerticalAlignment
 from desklab.primitives import Color
+from desklab.exceptions import LogicError
 from pygame.locals import QUIT
 from typing import Any, Iterable
 import os
@@ -48,11 +49,19 @@ class Window:
 
     @classmethod
     def get_width(cls) -> int:
+        cls._raise_if_not_set_up()
         return cls.__width
 
     @classmethod
     def get_height(cls) -> int:
+        cls._raise_if_not_set_up()
         return cls.__height
+
+    @classmethod
+    def _raise_if_not_set_up(cls) -> None:
+        if not cls.__is_set_up:
+            error = f"{cls.__name__} is not set up. Call the 'setup' method or create an instance before trying this action"
+            raise LogicError(error)
 
     def add_layer(self,
                   padding: int = 0,
