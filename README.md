@@ -1,13 +1,8 @@
 ![DeskLab-banner](./desklab_banner.png)
 
-DeskLab is a lightweight, ready-to-use Python interface library designed for small projects that prioritize fast development over extensive customization. It simulates the web development programing style, with separation of responsibilities and reusable components.
+DeskLab is a Python interface library designed for small projects that prioritize fast development over extensive customization.
 
----
-
-## 🚀 Features
-
-
----
+It simulates the web development programing style, with separation of responsibilities and reusable components.
 
 ## 🛠️ Installation & Development Setup
 
@@ -101,32 +96,3 @@ uv run <your_file>.py
 This guarantees execution inside the project's environment and avoids dependency conflicts.
 
 ---
-
-## 📂 Project Structure
-
-```text
-desklab/
-├── pyproject.toml
-├── README.md
-└── src/
-    └── desklab/
-        ├── ...
-```
-
----
-
-## Example
-
-A minimal interface example:
-
-```python
-
-```
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-See the project files for additional details.
