@@ -5,6 +5,10 @@ class DeskLabError(Exception):
     pass
 
 
+class LogicError(DeskLabError):
+    pass
+
+
 class InvalidParameterValue(DeskLabError, ValueError):
     def __init__(self, parameter_name: str, parameter_value: Any, rule: str = "") -> None:
         error = f"Invalid value {parameter_value!r} for '{parameter_name}'"
