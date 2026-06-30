@@ -25,6 +25,10 @@ class Window:
 
     @classmethod
     def setup(cls, width: int = 640, height: int = 480, caption: str = "DeskLab", icon: str | None = None) -> None:
+
+        if cls.__is_set_up:
+            return
+
         if icon is None:
             assets = resources.files('desklab._assets')
             icon_path = assets.joinpath('desklab.png')
