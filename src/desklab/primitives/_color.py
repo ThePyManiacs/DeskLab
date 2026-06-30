@@ -62,29 +62,29 @@ class Color:
 
     def __set_color(self, color: tuple[int, ...] | str):
         if isinstance(color, str):
-            color = self.__get_tuple_from_color_name(color)
-        self.__set_tuple(color)
+            self.__set_tuple_from_color_name(color)
+        else:
+            self.__set_tuple(color)
 
     def __set_tuple(self, color: tuple[int, ...]):
         self.__validate_length(len(color))
         if len(color) == 3:
-            color = (*color, 1)
+            color = (*color, 255)
         for channel in color:
             self.__validate_range(channel)
         self.__tuple = color
 
-    def __get_tuple_from_color_name(self, color: str) -> tuple[int, ...]:
+    def __set_tuple_from_color_name(self, color: str) -> None:
 
         positive_count = color.count("+")
         negative_count = color.count("-")
         raw_color = color.replace("+", "").replace("-", "")
-        color_tuple = self.__search_tuple(raw_color)
+        self.__tuple = self.__search_tuple(raw_color)
 
         for _ in range(positive_count):
-            color_tuple = self.__alter_brightness(self.__DEFAULT_DELTA, "+")
+            self.__tuple = self.__alter_brightness(self.__DEFAULT_DELTA, "+")
         for _ in range(negative_count):
-            color_tuple = self.__alter_brightness(self.__DEFAULT_DELTA, "-")
-        return color_tuple
+            self.__tuple = self.__alter_brightness(self.__DEFAULT_DELTA, "-")
 
     @value_check(operation=Check(lambda op: op in ["+", "-"], "Operation must be either '+' or '-'"))
     def __alter_brightness(self, intensity: int, operation: Literal["+", "-"]) -> tuple[int, ...]:
