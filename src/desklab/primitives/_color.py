@@ -123,11 +123,11 @@ class Color:
             return self.darkened(int((30 + 70 * factor) * (intensity / 100)))
 
     def lightened(self, intensity: int) -> 'Color':
-        new_tuple = self.__alter_brightness(intensity, "-")
+        new_tuple = self.__alter_brightness(intensity, "+")
         return Color(new_tuple)
 
     def darkened(self, intensity: int) -> 'Color':
-        new_tuple = self.__alter_brightness(intensity, "+")
+        new_tuple = self.__alter_brightness(intensity, "-")
         return Color(new_tuple)
 
     def with_alpha(self, alpha: int) -> 'Color':
