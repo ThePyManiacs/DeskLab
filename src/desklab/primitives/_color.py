@@ -88,7 +88,6 @@ class Color:
 
     @value_check(operation=Check(lambda op: op in ["+", "-"], "Operation must be either '+' or '-'"))
     def __alter_brightness(self, intensity: int, operation: Literal["+", "-"]) -> tuple[int, ...]:
-
         r, g, b, a = self.__tuple
 
         r /= 255
@@ -101,9 +100,9 @@ class Color:
         if operation == "+":
             lightness += (1 - lightness) * amount
         else:
-            lightness *= (1 - amount)
+            lightness -= lightness * amount
 
-        lightness = max(0, min(1, lightness))
+        lightness = max(0.0, min(1.0, lightness))
         r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
 
         return (int(r * 255), int(g * 255), int(b * 255), a)
@@ -112,15 +111,13 @@ class Color:
         r, g, b, _ = self.__tuple
         return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
-    def luminance_emphasized(self, intensity: int = 100) -> "Color":
+    def luminance_emphasized(self, intensity: int = 15) -> "Color":
         lum = self.get_luminance()
 
         if lum < 128:
-            factor = (128 - lum) / 128
-            return self.lightened(int((40 + 60 * factor) * (intensity / 100)))
+            return self.lightened(intensity)
         else:
-            factor = (lum - 128) / 127
-            return self.darkened(int((30 + 70 * factor) * (intensity / 100)))
+            return self.darkened(intensity)
 
     def lightened(self, intensity: int) -> 'Color':
         new_tuple = self.__alter_brightness(intensity, "+")
