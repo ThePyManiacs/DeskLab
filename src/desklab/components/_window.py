@@ -131,7 +131,9 @@ class Window:
 
     def __handle_event(self, *args: Any, **kwargs: Any):
         for layer in self.__layers:
-            layer.handle_event(*args, **kwargs)
+            if layer.is_visible():
+                layer.handle_event(*args, **kwargs)
+                break
 
     def __display_layers(self):
         for layer, surface in zip(self.__layers, self.__layer_surfaces):
