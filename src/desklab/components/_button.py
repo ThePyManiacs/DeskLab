@@ -18,17 +18,25 @@ class Button(FlexBox, ClickableArea):
                  vertical_alignment: str | VerticalAlignment = VerticalAlignment.CENTER,
                  corners_radius: tuple[int, int, int, int] | int = 0,
                  color: Color | tuple[int, ...] | str = "BLACK",
-                 bounded: bool = True) -> None:
+                 bounded: bool = True,
+                 trigger_actions_on_release: bool = False) -> None:
 
         super().__init__(width, height, padding,
                          space_between, flex_direction,
                          horizontal_alignment, vertical_alignment,
                          corners_radius, color, bounded)
+        self.__trigger_actions_on_release = trigger_actions_on_release
         self.__actions: list[Callable[..., Any]] = []
         self.add_actions(actions)
 
     def __add_click_listener(self):
-        if self.is_clicked():
+
+        if self.__trigger_actions_on_release:
+            condition = self.is_released()
+        else:
+            condition = self.is_clicked()
+
+        if condition:
             for action in self.get_actions():
                 action()
 
