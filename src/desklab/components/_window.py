@@ -130,9 +130,8 @@ class Window:
         self.__running = False
 
     def __handle_event(self, *args: Any, **kwargs: Any):
-        if not self.__layers:
-            return
-        self.__layers[-1].handle_event(*args, **kwargs)
+        for layer in self.__layers:
+            layer.handle_event(*args, **kwargs)
 
     def __display_layers(self):
         for layer, surface in zip(self.__layers, self.__layer_surfaces):
