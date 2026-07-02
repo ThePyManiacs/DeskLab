@@ -7,7 +7,7 @@ from desklab.system import Mouse
 
 class ClickableArea(RectangularArea, EventSensitiveEntity):
 
-    def __init__(self, width: int, height: int, color: Color | tuple[int, ...] | str = "BLACK", corners_radius: tuple[int, int, int, int] | int = 0) -> None:
+    def __init__(self, width: int, height: int, color: Color | tuple[int, ...] | str = "BLACK", corners_radius: tuple[int, ...] | int = 0) -> None:
         super().__init__(width, height, color, corners_radius)
         self.__is_clicked = False
         self.__is_held = False

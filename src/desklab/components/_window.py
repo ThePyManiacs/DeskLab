@@ -64,7 +64,7 @@ class Window:
             raise LogicError(error)
 
     def add_layer(self,
-                  padding: int = 0,
+                  padding: tuple[int, ...] | int = 0,
                   space_between: int = 0,
                   flex_direction: str | FlexDirection = FlexDirection.COLUMN,
                   horizontal_alignment: str | HorizontalAlignment = HorizontalAlignment.CENTER,

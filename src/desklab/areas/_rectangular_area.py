@@ -17,7 +17,7 @@ class RectangularArea(AreaInterface):
                  width: int,
                  height: int,
                  color: Color | tuple[int, ...] | str = "BLACK",
-                 corners_radius: tuple[int, int, int, int] | int = 0) -> None:
+                 corners_radius: tuple[int, ...] | int = 0) -> None:
         super().__init__(width, height, color)
         self.set_corners_radius(corners_radius)
 
@@ -29,7 +29,7 @@ class RectangularArea(AreaInterface):
     def __validate_corners_length(self, corners_radius: tuple[int, ...]) -> None:
         pass
 
-    def set_corners_radius(self, corners_radius: tuple[int, int, int, int] | int) -> None:
+    def set_corners_radius(self, corners_radius: tuple[int, ...] | int) -> None:
         if isinstance(corners_radius, int):
             corners = (corners_radius, ) * 4
         else:
@@ -42,7 +42,7 @@ class RectangularArea(AreaInterface):
     def __set_corners_radius(self, corners: tuple[int, ...]) -> None:
         self.__corners_radius = corners
 
-    def get_corners_radius(self) -> tuple[int, int, int, int]:
+    def get_corners_radius(self) -> tuple[int, ...]:
         assert len(self.__corners_radius) == 4
         return self.__corners_radius
 

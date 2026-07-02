@@ -14,12 +14,12 @@ class DragDrop(FlexBox):
     def __init__(self,
                  width: int,
                  height: int,
-                 padding: int = 0,
+                 padding: tuple[int, ...] | int = 0,
                  space_between: int = 0,
                  flex_direction: str | FlexDirection = FlexDirection.COLUMN,
                  horizontal_alignment: str | HorizontalAlignment = HorizontalAlignment.CENTER,
                  vertical_alignment: str | VerticalAlignment = VerticalAlignment.CENTER,
-                 corners_radius: tuple[int, int, int, int] | int = 0,
+                 corners_radius: tuple[int, ...] | int = 0,
                  color: Color | tuple[int, ...] | str = "BLACK",
                  bounded: bool = True) -> None:
 
