@@ -130,7 +130,7 @@ class Window:
         self.__running = False
 
     def __handle_event(self, *args: Any, **kwargs: Any):
-        for layer in self.__layers:
+        for layer in self.__layers[::-1]:
             if layer.is_visible():
                 layer.handle_event(*args, **kwargs)
                 break
