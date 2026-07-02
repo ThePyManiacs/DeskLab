@@ -36,7 +36,7 @@ class TextInput(ClickableArea):
                  height: int,
                  font: Optional[Font] = None,
                  text_color: Union[Color, tuple[int, ...], str] = "BLACK",
-                 corners_radius: Union[Tuple[int, int, int, int], int] = 0,
+                 corners_radius: Union[Tuple[int, ...], int] = 0,
                  background_color: Union[Color,
                                          tuple[int, ...], str] = "WHITE") -> None:
 

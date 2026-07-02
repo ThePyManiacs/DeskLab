@@ -10,7 +10,7 @@ T = TypeVar("T")
 class FlexBox(ProtectedFlexBox):
 
     def get_children(self) -> list[Entity]: return self._get_children()
-    def get_padding(self) -> int: return self._get_padding()
+    def get_padding(self) -> tuple[int, ...]: return self._get_padding()
     def get_space_between(self) -> int: return self._get_space_between()
     def is_bounded(self) -> bool: return self._is_bounded()
     def is_visible(self) -> bool: return self._is_visible()

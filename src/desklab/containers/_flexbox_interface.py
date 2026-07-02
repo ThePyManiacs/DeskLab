@@ -2,6 +2,7 @@
 from ._constants import VerticalAlignment, HorizontalAlignment, FlexDirection
 from abc import abstractmethod
 from typing import Any, Callable, Optional, Union, Self, TypeVar
+from desklab._check import value_check, CheckRange, CheckLength
 from desklab.areas import RectangularArea
 from desklab.exceptions import ContainerBoundsExceeded
 from desklab.entity_types import Entity, ContainableEntity, DisplayableEntity, EventSensitiveEntity, CopiableEntity
@@ -20,12 +21,12 @@ class FlexBoxInterface(RectangularArea, EventSensitiveEntity):
     def __init__(self,
                  width: int,
                  height: int,
-                 padding: int = 0,
+                 padding: tuple[int, ...] | int = 0,
                  space_between: int = 0,
                  flex_direction: str | FlexDirection = "COLUMN",
                  horizontal_alignment: str | HorizontalAlignment = "CENTER",
                  vertical_alignment: str | VerticalAlignment = "CENTER",
-                 corners_radius: tuple[int, int, int, int] | int = 0,
+                 corners_radius: tuple[int, ...] | int = 0,
                  color: Union[Color, tuple[int, ...], str] = "BLACK",
                  bounded: bool = True,
                  visible: bool = True, *args: Any, **kwargs: Any) -> None:
@@ -33,7 +34,7 @@ class FlexBoxInterface(RectangularArea, EventSensitiveEntity):
         self.__children: list[Entity] = []
         self._visible = visible
         self._bounded = bounded
-        self._padding = padding
+        self._padding = self.__normalize_padding(padding)
         self._space_between = space_between
 
         if isinstance(flex_direction, str):
@@ -50,7 +51,56 @@ class FlexBoxInterface(RectangularArea, EventSensitiveEntity):
 
         super().__init__(width, height, color, corners_radius)
 
-    def _get_padding(self) -> int: return self._padding
+    @value_check(padding=CheckRange(min_value=0, variable_name="padding"))
+    def __validate_padding_range(self, padding: tuple[int, ...]) -> None:
+        pass
+
+    @value_check(padding=CheckLength(reference_length=4, variable_name="padding"))
+    def __validate_padding_length(self, padding: tuple[int, ...]) -> None:
+        pass
+
+    def __normalize_padding(self, padding: tuple[int, ...] | int) -> tuple[int, ...]:
+        if isinstance(padding, int):
+            padding_tuple = (padding, ) * 4
+        else:
+            padding_tuple = padding
+
+        self.__validate_padding_length(padding_tuple)
+        self.__validate_padding_range(padding_tuple)
+        return padding_tuple
+
+    def _set_padding(self, padding: tuple[int, ...] | int) -> None:
+        self._padding = self.__normalize_padding(padding)
+        self._align()
+
+    def _get_padding(self) -> tuple[int, ...]:
+        return self._padding
+
+    def _get_padding_top(self) -> int: return self._get_padding()[0]
+    def _get_padding_right(self) -> int: return self._get_padding()[1]
+    def _get_padding_bottom(self) -> int: return self._get_padding()[2]
+    def _get_padding_left(self) -> int: return self._get_padding()[3]
+
+    def _get_main_axis_start_padding(self) -> int:
+        if self._get_flex_direction() == FlexDirection.ROW:
+            return self._get_padding_left()
+        return self._get_padding_top()
+
+    def _get_main_axis_end_padding(self) -> int:
+        if self._get_flex_direction() == FlexDirection.ROW:
+            return self._get_padding_right()
+        return self._get_padding_bottom()
+
+    def _get_secondary_axis_start_padding(self) -> int:
+        if self._get_flex_direction() == FlexDirection.ROW:
+            return self._get_padding_top()
+        return self._get_padding_left()
+
+    def _get_secondary_axis_end_padding(self) -> int:
+        if self._get_flex_direction() == FlexDirection.ROW:
+            return self._get_padding_bottom()
+        return self._get_padding_right()
+
     def _get_space_between(self) -> int: return self._space_between
     def _get_flex_direction(self) -> FlexDirection: return self._flex_direction
     def _is_bounded(self) -> bool: return self._bounded

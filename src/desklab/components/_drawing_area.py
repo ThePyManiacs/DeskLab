@@ -30,9 +30,8 @@ class DrawingArea(ClickableArea, EventSensitiveEntity):
     def __init__(self,
                  width: int,
                  height: int,
-                 corners_radius: tuple[int, int, int, int] | int = 0,
-                 background_color: Color | tuple[int,
-                                                 int, int] | str = "WHITE",
+                 corners_radius: tuple[int, ...] | int = 0,
+                 background_color: Color | tuple[int, ...] | str = "WHITE",
                  brush_color: Color | tuple[int, ...] | str = "BLACK",
                  brush_width: int = 10,
                  eraser_width: int = 10) -> None:

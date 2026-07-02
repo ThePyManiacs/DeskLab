@@ -49,9 +49,11 @@ class ProtectedFlexBox(FlexBoxInterface):
         return self._get_space_between() * (self._count_containable_children() - 1)
 
     def __validate_bounds(self, main_sum: int, secondary_max: int, total_space_between: int) -> None:
-        padding = self._get_padding()
-        main_limit = self.__get_main_dimension(self) - 2 * padding
-        cross_limit = self.__get_secondary_dimension(self) - 2 * padding
+        main_padding = self._get_main_axis_start_padding() + self._get_main_axis_end_padding()
+        secondary_padding = self._get_secondary_axis_start_padding() + \
+            self._get_secondary_axis_end_padding()
+        main_limit = self.__get_main_dimension(self) - main_padding
+        cross_limit = self.__get_secondary_dimension(self) - secondary_padding
 
         main_axis = "width"
         secondary_axis = "height"
@@ -65,9 +67,10 @@ class ProtectedFlexBox(FlexBoxInterface):
         if secondary_max > cross_limit:
             raise ContainerBoundsExceeded(self.__class__.__name__)
 
-    def __calculate_free_space(self, main_dimension_sum: int, total_space_between: int):
+    def __calculate_free_space(self, main_dimension_sum: int, total_space_between: int) -> int:
+        main_padding = self._get_main_axis_start_padding() + self._get_main_axis_end_padding()
         return (self.__get_main_dimension(self) -
-                2 * self._get_padding() -
+                main_padding -
                 main_dimension_sum - total_space_between)
 
     def __calculate_main_start_position(self, free_space: int) -> int:
@@ -78,7 +81,7 @@ class ProtectedFlexBox(FlexBoxInterface):
             alignment = self._get_vertical_alignment()
             base_coordinate = self.get_y()
 
-        start_pos = base_coordinate + self._get_padding()
+        start_pos = base_coordinate + self._get_main_axis_start_padding()
 
         if alignment == HorizontalAlignment.CENTER or alignment == VerticalAlignment.CENTER:
             start_pos += free_space // 2
@@ -109,8 +112,6 @@ class ProtectedFlexBox(FlexBoxInterface):
 
     def __calculate_secondary_axis_pos(self, child: ContainableEntity) -> int:
 
-        padding = self._get_padding()
-
         if self._get_flex_direction() == FlexDirection.COLUMN:
             align = self._get_horizontal_alignment()
             base_pos = self.get_x()
@@ -118,11 +119,14 @@ class ProtectedFlexBox(FlexBoxInterface):
             align = self._get_vertical_alignment()
             base_pos = self.get_y()
 
+        start_padding = self._get_secondary_axis_start_padding()
+        end_padding = self._get_secondary_axis_end_padding()
+
         container_dim = self.__get_secondary_dimension(self)
         child_dim = self.__get_secondary_dimension(child)
 
-        safe_area_start = base_pos + padding
-        safe_area_dim = container_dim - 2 * padding
+        safe_area_start = base_pos + start_padding
+        safe_area_dim = container_dim - start_padding - end_padding
 
         if align == HorizontalAlignment.CENTER or align == VerticalAlignment.CENTER:
             return safe_area_start + (safe_area_dim - child_dim) // 2
