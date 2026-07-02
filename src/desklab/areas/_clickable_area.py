@@ -15,6 +15,9 @@ class ClickableArea(RectangularArea, EventSensitiveEntity):
     def is_clicked(self) -> bool:
         return self.__is_clicked
 
+    def is_released(self) -> bool:
+        return self.__is_released
+
     def is_held(self) -> bool:
         return self.__is_held
 
@@ -24,4 +27,5 @@ class ClickableArea(RectangularArea, EventSensitiveEntity):
         inside = self.contains(mouse.get_position())
 
         self.__is_clicked = mouse.is_clicked() and inside
+        self.__is_released = mouse.is_released() and inside
         self.__is_held = mouse.is_held() and inside
