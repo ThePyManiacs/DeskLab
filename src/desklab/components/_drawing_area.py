@@ -76,6 +76,10 @@ class DrawingArea(ClickableArea, EventSensitiveEntity):
     def is_drawing(self) -> bool:
         return self.__drawing_mode == _DrawingMode.DRAWING
 
+    def get_canvas_buffer(self) -> bytes:
+        raw_bytes = pygame.image.tobytes(self.__canvas, "RGB")
+        return raw_bytes
+
     def __unpause(self):
         self.__execution_state = _ExecutionState.RUNNING
 

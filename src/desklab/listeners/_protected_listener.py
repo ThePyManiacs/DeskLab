@@ -12,7 +12,7 @@ class ProtectedListener(EventSensitiveEntity, CopiableEntity):
         self._listen_once = listen_once
         self._has_triggered = False
         self._on_change = on_change
-        self._previous_state = None
+        self._previous_state = False if on_change else None
         self._set_actions(actions)
         self._set_conditions(condition)
 
@@ -25,10 +25,7 @@ class ProtectedListener(EventSensitiveEntity, CopiableEntity):
         condition_value = self._trigger_conditions(*args, **kwargs)
 
         if self._on_change:
-            should_trigger = (
-                self._previous_state is not None
-                and condition_value != self._previous_state
-            )
+            should_trigger = condition_value != self._previous_state
         else:
             should_trigger = condition_value
 

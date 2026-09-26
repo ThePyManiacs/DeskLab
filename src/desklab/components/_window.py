@@ -90,7 +90,7 @@ class Window:
         return tuple(window_coordinates)
 
     def open(self) -> None:
-
+        pygame.event.clear()
         mouse = Mouse()
         keyboard = KeyBoard()
         clipboard = ClipBoard()
@@ -128,6 +128,7 @@ class Window:
 
     def close(self) -> None:
         self.__running = False
+        pygame.event.clear()
 
     def __handle_event(self, *args: Any, **kwargs: Any):
         for layer in self.__layers[::-1]:
