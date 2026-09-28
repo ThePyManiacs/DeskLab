@@ -138,7 +138,8 @@ class Window:
         self.__running = False
         pygame.event.clear()
         self.__open_window_stack.remove(self)
-        self.__transitioning = self.__open_window_stack[-1]
+        if self.__open_window_stack:
+            self.__transitioning = self.__open_window_stack[-1]
 
     def __handle_event(self, *args: Any, **kwargs: Any):
         for layer in self.__layers[::-1]:
