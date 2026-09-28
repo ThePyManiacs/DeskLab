@@ -91,7 +91,7 @@ class Text(ClickableArea):
         while low <= high:
             mid = (low + high) // 2
 
-            font = self.get_font().copy(replace_size=mid)
+            font = self.get_font().copy(size=mid)
             width, height = font.measure_text(self.__text)
 
             if width <= max_width and height <= max_height:
@@ -99,7 +99,7 @@ class Text(ClickableArea):
             else:
                 high = mid - 1
 
-        return self.copy(replace_font=font)
+        return self.copy(font=font)
 
     def display(self, screen: Surface) -> None:
         text_surface = self.__font.render(self.__text, self.get_color_tuple())
