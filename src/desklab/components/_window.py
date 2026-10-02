@@ -17,8 +17,6 @@ from importlib import resources
 class Window:
 
     __is_set_up = False
-    __open_window_stack: list[Window] = []
-    __transitioning: Window | None = None
 
     def __init__(self) -> None:
         if not self.__is_set_up:
@@ -92,12 +90,10 @@ class Window:
         return tuple(window_coordinates)
 
     def open(self) -> None:
-        pygame.event.clear()
         mouse = Mouse()
         keyboard = KeyBoard()
         clipboard = ClipBoard()
         self.__running = True
-        self.__open_window_stack.append(self)
         while self.__running:
 
             mouse.update_refference_origin(
@@ -105,10 +101,6 @@ class Window:
 
             if events := pygame.event.get():
                 for event in events:
-
-                    if self.__transitioning == self:
-                        self.__transitioning = None
-                        break
 
                     keyboard.update_event(event)
                     mouse.update_event(event)
@@ -136,10 +128,6 @@ class Window:
 
     def close(self) -> None:
         self.__running = False
-        pygame.event.clear()
-        self.__open_window_stack.remove(self)
-        if self.__open_window_stack:
-            self.__transitioning = self.__open_window_stack[-1]
 
     def __handle_event(self, *args: Any, **kwargs: Any):
         for layer in self.__layers[::-1]:

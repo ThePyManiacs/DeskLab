@@ -13,7 +13,8 @@ from pygame.constants import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION, DROPFI
 class Mouse(SystemInput):
 
     def __init__(self) -> None:
-        self.__position = (0, 0)
+        self.__event_position = (0, 0)
+        self.__continuous_position = (0, 0)
         self.__refference_x = 0
         self.__refference_y = 0
         self.__is_held = False
@@ -27,6 +28,7 @@ class Mouse(SystemInput):
 
     def update_event(self, event: Optional[Event]):
         self.__event = event
+        self.__event_position = self.__continuous_position
         if self.is_clicked():
             self.__is_held = True
         elif self.is_released():
@@ -37,7 +39,7 @@ class Mouse(SystemInput):
         self.__refference_y = y
 
     def get_position(self) -> tuple[int, int]:
-        return self.__position
+        return self.__event_position
 
     def is_held(self) -> bool:
         return self.__is_held
@@ -55,8 +57,8 @@ class Mouse(SystemInput):
         return self.__matches_current_event(DROPFILE)
 
     def __position_listener(self, x: int | float, y: int | float, *args: Any) -> None:
-        self.__position = (int(x - self.__refference_x),
-                           int(y - self.__refference_y))
+        self.__continuous_position = (int(x - self.__refference_x),
+                                      int(y - self.__refference_y))
 
     def __activate_listeners(self) -> None:
         self._listener = mouse.Listener(on_move=self.__position_listener)
